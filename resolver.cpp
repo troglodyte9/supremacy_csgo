@@ -639,14 +639,14 @@ void Resolver::ResolveStand(AimPlayer* data, LagRecord* record, Player* player) 
 
 		bool can_last_move = data->m_correct_move && data->m_lastmove_idx < 1;
 
-		if (record->m_fake_walk) {
+		/*if (record->m_fake_walk) {
 			{
 				record->m_mode = Modes::RESOLVE_FAKEWALK;
-				record->m_eye_angles.y = record->m_body; /* real */
+				record->m_eye_angles.y = record->m_body;
 				resolver_state[record->m_player->index()] = XOR("FAKEWALK");
 				return;
 			}
-		}
+		}*/
 
 		if (fabsf(last_move_delta) < 12.f
 			&& can_last_move)
