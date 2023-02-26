@@ -163,6 +163,21 @@ public:
 	};
 };
 
+class IMaterialVar {
+private:
+public:
+	void set_float_value(float value) {
+		util::get_method< void(__thiscall*)(decltype(this), float) >(this, 4)(this, value);
+	}
+
+	void set_vec_value(float r, float g, float b) {
+		util::get_method< void(__thiscall*)(decltype(this), float, float, float) >(this, 11)(this, r, g, b);
+	}
+
+	void set_string_value(char const* value) {
+		util::get_method< void(__thiscall*)(decltype(this), char const*) >(this, 6)(this, value);
+	}
+};
 class IMaterial {
 public:
 	enum indices : size_t {
@@ -206,7 +221,26 @@ public:
 	__forceinline bool GetFlag( int fl ) {
 		return util::get_method< bool( __thiscall* )( void*, int ) >( this, GETFLAG )( this, fl );
 	}
+
+
+	__forceinline IMaterialVar* FindVar(const char* varName, bool* found, bool complain = false) {
+		return util::get_method< IMaterialVar* (__thiscall*)(void*, const char*, bool*, bool) >(this, 11)(this, varName, found, complain);
+	}
+
+	IMaterialVar* find_var(const char* name)
+	{
+		bool found;
+		const auto ret = FindVar(name, &found);
+
+		if (found)
+			return ret;
+
+		return nullptr;
+	}
+
 };
+
+
 
 class IMaterialSystem {
 public:

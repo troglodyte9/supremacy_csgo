@@ -451,9 +451,6 @@ public:
 	MultiDropdown box;
 	Colorpicker   box_enemy;
 	Colorpicker   box_friendly;
-	Checkbox      dormant;
-	Checkbox      offscreen;
-	Colorpicker   offscreen_color;
 	MultiDropdown name;
 	Colorpicker   name_color;
 	MultiDropdown health;
@@ -467,29 +464,60 @@ public:
 	Colorpicker   lby_update_color;
 
 	// col2.
+
 	MultiDropdown skeleton;
 	Colorpicker   skeleton_enemy;
 	Colorpicker   skeleton_friendly;
-
 	MultiDropdown glow;
+	Checkbox sound_esp;
+	Colorpicker sound_espcol;
+	Slider      sound_esp_alpha;
 	Colorpicker   glow_enemy;
 	Colorpicker   glow_friendly;
 	Slider        glow_blend;
+	Dropdown	  chams_entity_selection;
+	Checkbox      chams_local;
+	Checkbox      fake_indicator;
+	Dropdown	  chams_local_mat;
+	Colorpicker   chams_local_col;
+	Colorpicker   chams_local2_col;
+	Slider        chams_local_blend;
+	Checkbox      chams_local_scope;
+	Slider		  chams_local_scope_blend;
+
 	MultiDropdown chams_enemy;
+	Dropdown	  chams_enemy_mat;
 	Colorpicker   chams_enemy_vis;
+	Colorpicker   chams_enemy2_vis;
 	Colorpicker   chams_enemy_invis;
+	Colorpicker   chams_enemy2_invis;
 	Slider        chams_enemy_blend;
 	Checkbox      chams_enemy_history;
+	Slider        chams_enemy_blend2;
+	Dropdown	  chams_enemy_history_mat;
 	Colorpicker   chams_enemy_history_col;
 	Slider        chams_enemy_history_blend;
+	Checkbox      history_skeleton;
+	Colorpicker   history_skeleton_col;
+
 	MultiDropdown chams_friendly;
+	Dropdown	  chams_friendly_mat;
 	Colorpicker   chams_friendly_vis;
 	Colorpicker   chams_friendly_invis;
 	Slider        chams_friendly_blend;
-	Checkbox      chams_local;
-	Colorpicker   chams_local_col;
-	Slider        chams_local_blend;
-	Checkbox      chams_local_scope;
+
+	Checkbox      chams_fake;
+	Dropdown	  chams_fake_mat;
+	Colorpicker   chams_fake_col;
+	Colorpicker   chams_fake_glow_col;
+	Slider        chams_fake_blend;
+
+	Checkbox      chams_shot;
+	Dropdown      chams_shot_mat;
+	Colorpicker   chams_shot_col;
+	Slider        chams_shot_blend;
+	Slider        chams_shot_fadetime;
+
 
 public:
 	void init() {
@@ -503,15 +531,6 @@ public:
 
 		box_friendly.setup(XOR("box friendly color"), XOR("box_friendly"), { 255, 200, 0 });
 		RegisterElement(&box_friendly);
-
-		dormant.setup(XOR("dormant enemies"), XOR("dormant"));
-		RegisterElement(&dormant);
-
-		offscreen.setup(XOR("enemy offscreen esp"), XOR("offscreen"));
-		RegisterElement(&offscreen);
-
-		offscreen_color.setup(XOR("offscreen esp color"), XOR("offscreen_color"), colors::white);
-		RegisterElement(&offscreen_color);
 
 		name.setup(XOR("name"), XOR("name"), { XOR("enemy"), XOR("friendly") });
 		RegisterElement(&name);
@@ -546,6 +565,17 @@ public:
 		lby_update_color.setup(XOR("color"), XOR("lby_update_color"), colors::orange);
 		RegisterElement(&lby_update_color);
 
+		sound_esp.setup(XOR("visualize sounds"), XOR("sound_esp"));
+		RegisterElement(&sound_esp);
+
+		sound_espcol.setup(XOR("visualize sounds color"), XOR("sound_espcol"), { 250, 63, 63 });
+		sound_espcol.AddShowCallback(callbacks::soundespison);
+		RegisterElement(&sound_espcol);
+
+		sound_esp_alpha.setup("", XOR("sound_esp_alpha"), 0.f, 255.f, false, 0, 255.f, 1.f, XOR(L"%"));
+		sound_esp_alpha.AddShowCallback(callbacks::soundespison);
+		RegisterElement(&sound_esp_alpha);
+
 		// col2.
 		skeleton.setup(XOR("skeleton"), XOR("skeleton"), { XOR("enemy"), XOR("friendly") });
 		RegisterElement(&skeleton, 1);
@@ -559,6 +589,8 @@ public:
 		glow.setup(XOR("glow"), XOR("glow"), { XOR("enemy"), XOR("friendly") });
 		RegisterElement(&glow, 1);
 
+
+
 		glow_enemy.setup(XOR("enemy color"), XOR("glow_enemy"), { 150, 200, 60 });
 		RegisterElement(&glow_enemy, 1);
 
@@ -568,50 +600,155 @@ public:
 		glow_blend.setup("", XOR("glow_blend"), 10.f, 100.f, false, 0, 60.f, 1.f, XOR(L"%"));
 		RegisterElement(&glow_blend, 1);
 
-		chams_enemy.setup(XOR("chams enemy"), XOR("chams_enemy"), { XOR("visible"), XOR("invisible") });
-		RegisterElement(&chams_enemy, 1);
 
-		chams_enemy_vis.setup(XOR("color visible"), XOR("chams_enemy_vis"), { 150, 200, 60 });
-		RegisterElement(&chams_enemy_vis, 1);
-
-		chams_enemy_invis.setup(XOR("color invisible"), XOR("chams_enemy_invis"), { 60, 180, 225 });
-		RegisterElement(&chams_enemy_invis, 1);
-
-		chams_enemy_blend.setup("", XOR("chams_enemy_blend"), 10.f, 100.f, false, 0, 100.f, 1.f, XOR(L"%"));
-		RegisterElement(&chams_enemy_blend, 1);
-
-		chams_enemy_history.setup(XOR("chams history"), XOR("chams_history"));
-		RegisterElement(&chams_enemy_history, 1);
-
-		chams_enemy_history_col.setup(XOR("color"), XOR("chams_history_col"), { 255, 255, 200 });
-		RegisterElement(&chams_enemy_history_col, 1);
-
-		chams_enemy_history_blend.setup("", XOR("chams_history_blend"), 10.f, 100.f, false, 0, 100.f, 1.f, XOR(L"%"));
-		RegisterElement(&chams_enemy_history_blend, 1);
-
-		chams_friendly.setup(XOR("chams friendly"), XOR("chams_friendly"), { XOR("visible"), XOR("invisible") });
-		RegisterElement(&chams_friendly, 1);
-
-		chams_friendly_vis.setup(XOR("color visible"), XOR("chams_friendly_vis"), { 255, 200, 0 });
-		RegisterElement(&chams_friendly_vis, 1);
-
-		chams_friendly_invis.setup(XOR("color invisible"), XOR("chams_friendly_invis"), { 255, 50, 0 });
-		RegisterElement(&chams_friendly_invis, 1);
-
-		chams_friendly_blend.setup("", XOR("chams_friendly_blend"), 10.f, 100.f, false, 0, 100.f, 1.f, XOR(L"%"));
-		RegisterElement(&chams_friendly_blend, 1);
+		chams_entity_selection.setup("chams selection", XOR("chams_entity_selection"), { XOR("local"), XOR("enemy"), XOR("friendly"), XOR("history"), XOR("fake"), XOR("shot") });
+		RegisterElement(&chams_entity_selection, 1);
 
 		chams_local.setup(XOR("chams local"), XOR("chams_local"));
+		chams_local.AddShowCallback(callbacks::IsChamsSelection0);
 		RegisterElement(&chams_local, 1);
 
-		chams_local_col.setup(XOR("color"), XOR("chams_local_col"), { 255, 255, 200 });
+		chams_local_mat.setup(XOR("chams local material"), XOR("chams_local_mat"), { XOR("material"), XOR("flat"), XOR("metallic"), XOR("gloss"), XOR("glow") });
+		chams_local_mat.AddShowCallback(callbacks::IsChamsSelection0);
+		RegisterElement(&chams_local_mat, 1);
+
+		chams_local_col.setup(XOR("color"), XOR("chams_local_col"), { 50, 50, 50 });
+		chams_local_col.AddShowCallback(callbacks::IsChamsSelection0);
 		RegisterElement(&chams_local_col, 1);
 
-		chams_local_blend.setup("", XOR("chams_local_blend"), 10.f, 100.f, false, 0, 100.f, 1.f, XOR(L"%"));
+		chams_local2_col.setup(XOR("glow color"), XOR("chams_local2_col"), { 9, 45, 59 });
+		chams_local2_col.AddShowCallback(callbacks::LocalGlowChamsSelection);
+		RegisterElement(&chams_local2_col, 1);
+
+		chams_local_blend.setup("", XOR("chams_local_blend"), 0.f, 100.f, false, 0, 100.f, 1.f, XOR(L"%"));
+		chams_local_blend.AddShowCallback(callbacks::IsChamsSelection0);
 		RegisterElement(&chams_local_blend, 1);
 
 		chams_local_scope.setup(XOR("blend when scoped"), XOR("chams_local_scope"));
+		chams_local_scope.AddShowCallback(callbacks::IsChamsSelection0);
 		RegisterElement(&chams_local_scope, 1);
+
+		chams_local_scope_blend.setup("", XOR("chams_local_scope_blend"), 0.f, 100.f, false, 0, 100.f, 1.f, XOR(L"%"));
+		chams_local_scope_blend.AddShowCallback(callbacks::IsChamsSelection0);
+		RegisterElement(&chams_local_scope_blend, 1);
+
+		chams_enemy.setup(XOR("chams enemy"), XOR("chams_enemy"), { XOR("visible"), XOR("invisible") });
+		chams_enemy.AddShowCallback(callbacks::IsChamsSelection1);
+		RegisterElement(&chams_enemy, 1);
+
+		chams_enemy_mat.setup(XOR("chams enemy material"), XOR("chams_enemy_mat"), { XOR("material"), XOR("flat"), XOR("metallic"), XOR("gloss"), XOR("glow"), XOR("outline glow") });
+		chams_enemy_mat.AddShowCallback(callbacks::IsChamsSelection1);
+		RegisterElement(&chams_enemy_mat, 1);
+
+		chams_enemy_vis.setup(XOR("color visible"), XOR("chams_enemy_vis"), { 150, 200, 60 });
+		chams_enemy_vis.AddShowCallback(callbacks::IsChamsSelection1);
+		RegisterElement(&chams_enemy_vis, 1);
+
+		chams_enemy2_vis.setup(XOR("glow color"), XOR("chams_enemy2_vis"), { 255, 255, 200 });
+		chams_enemy2_vis.AddShowCallback(callbacks::EnemyGlowChamsSelection);
+		RegisterElement(&chams_enemy2_vis, 1);
+
+		chams_enemy_invis.setup(XOR("color invisible"), XOR("chams_enemy_invis"), { 60, 120, 180 });
+		chams_enemy_invis.AddShowCallback(callbacks::IsChamsSelection1);
+		RegisterElement(&chams_enemy_invis, 1);
+
+		chams_enemy2_invis.setup(XOR("glow color"), XOR("chams_enemy2_invis"), { 255, 255, 200, 180 });
+		chams_enemy2_invis.AddShowCallback(callbacks::EnemyGlowChamsSelection);
+		RegisterElement(&chams_enemy2_invis, 1);
+
+		chams_enemy_blend.setup("visible", XOR("chams_enemy_blend"), 0.f, 100.f, true, 0, 100.f, 1.f, XOR(L"%"));
+		chams_enemy_blend.AddShowCallback(callbacks::IsChamsSelection1);
+		RegisterElement(&chams_enemy_blend, 1);
+
+		chams_enemy_blend2.setup("invis", XOR("chams_enemy_blend2"), 0.f, 100.f, true, 0, 100.f, 1.f, XOR(L"%"));
+		chams_enemy_blend2.AddShowCallback(callbacks::IsChamsSelection1);
+		RegisterElement(&chams_enemy_blend2, 1);
+
+		chams_friendly.setup(XOR("chams friendly"), XOR("chams_friendly"), { XOR("visible"), XOR("invisible") });
+		chams_friendly.AddShowCallback(callbacks::IsChamsSelection2);
+		RegisterElement(&chams_friendly, 1);
+
+		chams_friendly_mat.setup(XOR("chams friendly material"), XOR("chams_friendly_mat"), { XOR("material"), XOR("flat"), XOR("metallic"), XOR("gloss"), XOR("glow"), XOR("outline glow") });
+		chams_friendly_mat.AddShowCallback(callbacks::IsChamsSelection2);
+		RegisterElement(&chams_friendly_mat, 1);
+
+		chams_friendly_vis.setup(XOR("color visible"), XOR("chams_friendly_vis"), { 255, 200, 0 });
+		chams_friendly_vis.AddShowCallback(callbacks::IsChamsSelection2);
+		RegisterElement(&chams_friendly_vis, 1);
+
+		chams_friendly_invis.setup(XOR("color invisible"), XOR("chams_friendly_invis"), { 255, 50, 0 });
+		chams_friendly_invis.AddShowCallback(callbacks::IsChamsSelection2);
+		RegisterElement(&chams_friendly_invis, 1);
+
+		chams_friendly_blend.setup("", XOR("chams_friendly_blend"), 0.f, 100.f, false, 0, 100.f, 1.f, XOR(L"%"));
+		chams_friendly_blend.AddShowCallback(callbacks::IsChamsSelection2);
+		RegisterElement(&chams_friendly_blend, 1);
+
+		chams_enemy_history.setup(XOR("chams history"), XOR("chams_history"));
+		chams_enemy_history.AddShowCallback(callbacks::IsChamsSelection3);
+		RegisterElement(&chams_enemy_history, 1);
+
+		chams_enemy_history_mat.setup(XOR("chams history material"), XOR("chams_enemy_history_mat"), { XOR("material"), XOR("flat"), XOR("metallic"), XOR("gloss"), XOR("glow"), XOR("outline glow") });
+		chams_enemy_history_mat.AddShowCallback(callbacks::IsChamsSelection3);
+		RegisterElement(&chams_enemy_history_mat, 1);
+
+		chams_enemy_history_col.setup(XOR("color"), XOR("chams_history_col"), { 0, 0, 0 });
+		chams_enemy_history_col.AddShowCallback(callbacks::IsChamsSelection3);
+		RegisterElement(&chams_enemy_history_col, 1);
+
+		chams_enemy_history_blend.setup("", XOR("chams_history_blend"), 0.f, 100.f, false, 0, 100.f, 1.f, XOR(L"%"));
+		chams_enemy_history_blend.AddShowCallback(callbacks::IsChamsSelection3);
+		RegisterElement(&chams_enemy_history_blend, 1);
+
+		history_skeleton.setup(XOR("history skeleton"), XOR("history_skeleton"));
+		history_skeleton.AddShowCallback(callbacks::IsChamsSelection3);
+		RegisterElement(&history_skeleton, 1);
+
+		history_skeleton_col.setup(XOR("color"), XOR("history_skeleton_col"), { 255, 255, 255 });
+		history_skeleton_col.AddShowCallback(callbacks::IsChamsSelection3);
+		RegisterElement(&history_skeleton_col, 1);
+
+		chams_fake.setup(XOR("fake chams"), XOR("chams_fake"));
+		chams_fake.AddShowCallback(callbacks::IsChamsSelection4);
+		RegisterElement(&chams_fake, 1);
+
+		chams_fake_mat.setup(XOR("chams material"), XOR("chams_fake_mat"), { XOR("material"), XOR("flat"), XOR("metallic"), XOR("gloss"), XOR("glow"), XOR("outline glow") });
+		chams_fake_mat.AddShowCallback(callbacks::IsChamsSelection4);
+		RegisterElement(&chams_fake_mat, 1);
+
+		chams_fake_col.setup(XOR("color"), XOR("chams_fake_col"), { 255, 200, 0 });
+		chams_fake_col.AddShowCallback(callbacks::IsChamsSelection4);
+		RegisterElement(&chams_fake_col, 1);
+
+		chams_fake_glow_col.setup(XOR("glow color"), XOR("chams_fake_glow_col"), { 255, 200, 0 });
+		chams_fake_glow_col.AddShowCallback(callbacks::IsChamsSelection4);
+		chams_fake_glow_col.AddShowCallback(callbacks::FakeGlowChamsSelection);
+		RegisterElement(&chams_fake_glow_col, 1);
+
+		chams_fake_blend.setup("", XOR("chams_fake_blend"), 0.f, 100.f, false, 0, 100.f, 1.f, XOR(L"%"));
+		chams_fake_blend.AddShowCallback(callbacks::IsChamsSelection4);
+		RegisterElement(&chams_fake_blend, 1);
+
+
+		chams_shot.setup(XOR("shot chams"), XOR("chams_shot"));
+		chams_shot.AddShowCallback(callbacks::IsChamsSelection5);
+		RegisterElement(&chams_shot, 1);
+
+		chams_shot_mat.setup(XOR("chams material"), XOR("chams_shot_mat"), { XOR("material"), XOR("flat"), XOR("metallic"), XOR("gloss"), XOR("glow"), XOR("outline glow") });
+		chams_shot_mat.AddShowCallback(callbacks::IsChamsSelection5);
+		RegisterElement(&chams_shot_mat, 1);
+
+		chams_shot_col.setup(XOR("color"), XOR("chams_shot_col"), { 255, 255, 255 });
+		chams_shot_col.AddShowCallback(callbacks::IsChamsSelection5);
+		RegisterElement(&chams_shot_col, 1);
+
+		chams_shot_blend.setup("", XOR("chams_shot_blend"), 1.f, 255.f, false, 0, 255.f, 1.f, XOR(L"%"));
+		chams_shot_blend.AddShowCallback(callbacks::IsChamsSelection5);
+		RegisterElement(&chams_shot_blend, 1);
+
+		chams_shot_fadetime.setup("fade time", XOR("chams_shot_fadetime"), 0.01f, 10.1f, true, 0.01f, 0.01f, 0.01f, XOR(L"s"));
+		chams_shot_fadetime.AddShowCallback(callbacks::IsChamsSelection5);
+		RegisterElement(&chams_shot_fadetime, 1);
 	}
 };
 

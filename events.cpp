@@ -1,6 +1,7 @@
 #include "includes.h"
 
 Listener g_listener{};;
+CSoundEsp SoundEsp{};;
 
 void events::round_start( IGameEvent* evt ) { 
 	// new round has started. no longer round end.
@@ -57,6 +58,9 @@ void events::round_start( IGameEvent* evt ) {
 
 	// clear origins.
 	g_cl.m_net_pos.clear( );
+
+	// clear existing steps.
+	SoundEsp.ClearSteps();
 }
 
 void events::round_end( IGameEvent* evt ) {
@@ -144,6 +148,22 @@ void events::player_hurt( IGameEvent* evt ) {
 		info.alpha = 255;
 		info.time = g_csgo.m_globals->m_curtime;
 		g_visuals.hitmarkers.push_back(info);
+
+		if (!strcmp(evt->GetName(), XOR("player_hurt")) && g_menu.main.players.sound_esp.get()) {
+			static float lasttime[64] = { 0.f };
+			auto ent = g_csgo.m_entlist->GetClientEntity< Player* >(g_csgo.m_engine->GetPlayerForUserID(evt->GetInt(XOR("userid"))));
+			if (ent == nullptr)
+				return;
+
+			if (!ent && ent == g_cl.m_local || g_cl.m_local->m_iTeamNum() == ent->m_iTeamNum() || ent->dormant() || !ent->alive())
+				return;
+
+			if (g_csgo.m_globals->m_curtime - lasttime[ent->index()] > .5f) {
+				SoundEsp.StepsData.push_back(CSoundEsp::CSoundEsp_info(ent->GetAbsOrigin(), .5f, g_menu.main.players.sound_espcol.get()));
+
+				lasttime[ent->index()] = g_csgo.m_globals->m_curtime;
+			}
+		}
 	}
 }
 
@@ -459,4 +479,58 @@ void Listener::init( ) {
     add( XOR( "bomb_defused" ), events::bomb_defused );
 
 	register_events( );
+}
+void CSoundEsp::AddStepManually(int ent, vec3_t origin) {
+	static float lasttime[4096] = { 0.f };
+
+	if (g_csgo.m_globals->m_curtime - lasttime[ent] > 1.5f) { // pFix задержка
+		StepsData.push_back(CSoundEsp_info(origin, .5f, g_menu.main.players.sound_espcol.get()));
+
+		lasttime[ent] = g_csgo.m_globals->m_curtime;
+	}
+}
+
+void CSoundEsp::ClearSteps() {
+	StepsData.clear();
+}
+
+void CSoundEsp::DrawSteps() {
+	if (1) {
+		if (g_csgo.m_engine->IsInGame()) {
+			BeamInfo_t beamInfo;
+
+			for (size_t i = 0; i < StepsData.size(); i++) {
+				auto current = StepsData.at(i);
+				beamInfo.m_nType = 0x07;
+				beamInfo.m_pszModelName = "sprites/purplelaser1.vmt";
+				beamInfo.m_nModelIndex = g_csgo.m_model_info->GetModelIndex("sprites/purplelaser1.vmt");
+				//beam_info.m_pszHaloName   = "sprites/purplelaser1.vmt"
+				beamInfo.m_nHaloIndex = -1;
+				beamInfo.m_flHaloScale = 3.f;
+				beamInfo.m_flLife = 3.f; //
+				beamInfo.m_flWidth = 5.f;
+				beamInfo.m_flFadeLength = 1.0f;
+				beamInfo.m_flAmplitude = 0.f;
+				beamInfo.m_flRed = current.color.r();
+				beamInfo.m_flGreen = current.color.g();
+				beamInfo.m_flBlue = current.color.b();
+				beamInfo.m_flBrightness = g_menu.main.players.sound_esp_alpha.get();
+				beamInfo.m_flSpeed = 0.f;
+				beamInfo.m_nStartFrame = 0.f;
+				beamInfo.m_flFrameRate = 60.f;
+				beamInfo.m_nSegments = -1;
+				//beam_info.m_bRenderable   = true;
+				beamInfo.m_nFlags = 0x00000008;
+				beamInfo.m_vecCenter = current.origin + vec3_t(0, 0, 5);
+				beamInfo.m_flStartRadius = 5.f;
+				beamInfo.m_flEndRadius = 1100.f;
+				auto myBeam = g_csgo.m_beams->CreateBeamRingPoint(beamInfo);
+
+				if (myBeam)
+					g_csgo.m_beams->DrawBeam(myBeam);
+
+				StepsData.erase(StepsData.begin() + i);
+			}
+		}
+	}
 }

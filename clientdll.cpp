@@ -76,7 +76,7 @@ void Hooks::FrameStageNotify( Stage_t stage ) {
         // draw our custom beams.
 		g_visuals.ImpactData();
         g_visuals.DrawBeams( );
-	
+		SoundEsp.DrawSteps();
 	}
 
 	// call og.

@@ -73,6 +73,7 @@ using ulong_t = unsigned long;
 #include "render.h"
 #include "pred.h"
 #include "lagrecord.h"
+#include "ServerSound.h"
 #include "visuals.h"
 #include "movement.h"
 #include "bonesetup.h"

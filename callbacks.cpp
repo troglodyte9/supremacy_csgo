@@ -55,6 +55,52 @@ bool callbacks::IsSeperatePointscaleOff() {
 }
 
 
+
+bool callbacks::IsChamsSelection0() {
+	return g_menu.main.players.chams_entity_selection.get() == 0;
+}
+
+bool callbacks::LocalGlowChamsSelection()
+{
+	return g_menu.main.players.chams_entity_selection.get() == 0 && g_menu.main.players.chams_local_mat.get() == 4;
+}
+
+bool callbacks::IsChamsSelection1() {
+	return g_menu.main.players.chams_entity_selection.get() == 1;
+}
+
+bool callbacks::EnemyGlowChamsSelection()
+{
+	return g_menu.main.players.chams_entity_selection.get() == 1 && g_menu.main.players.chams_enemy_mat.get() == 4;
+}
+
+bool callbacks::IsChamsSelection2() {
+	return g_menu.main.players.chams_entity_selection.get() == 2;
+}
+
+bool callbacks::IsChamsSelection3() {
+	return g_menu.main.players.chams_entity_selection.get() == 3;
+}
+
+bool callbacks::soundespison() {
+	return g_menu.main.players.sound_esp.get();
+}
+
+bool callbacks::IsChamsSelection4()
+{
+	return g_menu.main.players.chams_entity_selection.get() == 4;
+}
+
+bool callbacks::IsChamsSelection5()
+{
+	return g_menu.main.players.chams_entity_selection.get() == 5;
+}
+
+bool callbacks::FakeGlowChamsSelection()
+{
+	return g_menu.main.players.chams_entity_selection.get() == 4 && g_menu.main.players.chams_fake_mat.get() == 4;
+}
+
 void callbacks::ConfigLoad1() {
 	g_config.load(&g_menu.main, XOR("1.sup"));
 	g_menu.main.config.config.select(1 - 1);

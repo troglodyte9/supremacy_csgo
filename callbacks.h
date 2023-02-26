@@ -49,6 +49,17 @@ namespace callbacks {
 	bool IsConfigMM();
 	bool IsConfigNS();
 	bool IsConfig1();
+
+	bool IsChamsSelection0();
+	bool LocalGlowChamsSelection();
+	bool IsChamsSelection1();
+	bool EnemyGlowChamsSelection();
+	bool IsChamsSelection2();
+	bool IsChamsSelection3();
+	bool IsChamsSelection4();
+	bool IsChamsSelection5();
+	bool FakeGlowChamsSelection();
+	bool soundespison();
 	bool IsConfig2();
 	bool IsConfig3();
 	bool IsConfig4();

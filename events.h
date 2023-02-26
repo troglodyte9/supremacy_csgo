@@ -61,4 +61,29 @@ namespace events {
     void bomb_exploded( IGameEvent* evt );
 }
 
+class CSoundEsp {
+public:
+	void DrawSteps();
+	void ClearSteps();
+	void AddStepManually(int ent, vec3_t origin);
+
+public:
+	class CSoundEsp_info {
+	public:
+		CSoundEsp_info(vec3_t origin, float time, Color color) {
+			this->origin = origin;
+			this->time = time;
+			this->color = color;
+		}
+
+		vec3_t origin;
+		float time;
+		Color color;
+		Beam_t* beamInfo;
+	};
+
+	std::vector<CSoundEsp_info> StepsData;
+};
+
+extern CSoundEsp SoundEsp;
 extern Listener g_listener;

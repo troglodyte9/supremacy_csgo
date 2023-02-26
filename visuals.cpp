@@ -588,7 +588,10 @@ void Visuals::draw( Entity* ent ) {
 			return;
 
 		// draw player esp.
+		if (!player->dormant()) g_sound.m_cSoundPlayers[player->index()].reset(true, player->GetAbsOrigin(), player->m_fFlags());
+		else g_sound.AdjustPlayerBegin(player);
 		DrawPlayer( player );
+		g_sound.Finish();
 	}
 
 	else if( g_menu.main.visuals.items.get( ) && ent->IsBaseCombatWeapon( ) && !ent->dormant( ) )
@@ -740,8 +743,8 @@ void Visuals::OffScreen( Player* player, int alpha ) {
 		out_offscreen_pos.y = ( int ) ( ( g_cl.m_height / 2.f ) - ( radius * ca ) );
 	};
 
-	if( !g_menu.main.players.offscreen.get( ) )
-		return;
+	/*if (!g_menu.main.players.offscreen.get())
+		return*/
 
 	if( !g_cl.m_processing || !g_cl.m_local->enemy( player ) )
 		return;
@@ -827,7 +830,7 @@ void Visuals::OffScreen( Player* player, int alpha ) {
 		//     damage_data.m_color = colors::white;
 
 		// render!
-		color = g_menu.main.players.offscreen_color.get( ); // damage_data.m_color;
+		color = Color(255, 255, 255); // damage_data.m_color;
 		color.a( ) = ( alpha == 255 ) ? alpha : alpha / 2;
 
 		g_csgo.m_surface->DrawSetColor( color );
@@ -878,7 +881,7 @@ void Visuals::DrawPlayer( Player* player ) {
 	dormant ? opacity -= step : opacity += step;
 
 	// is dormant esp enabled for this player.
-	bool dormant_esp = enemy && g_menu.main.players.dormant.get( );
+	bool dormant_esp = enemy;
 
 	// clamp the opacity.
 	math::clamp( opacity, 0.f, 1.f );
