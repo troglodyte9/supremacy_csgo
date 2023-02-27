@@ -34,6 +34,23 @@ void Hooks::DoExtraBoneProcessing( int a2, int a3, int a4, int a5, int a6, int a
 		animstate->m_player = backup;
 }
 
+void Hooks::BuildTransformations( int a2, int a3, int a4, int a5, int a6, int a7 ) {
+	// cast thisptr to player ptr.
+	Player* player = ( Player* )this;
+
+	// get bone jiggle.
+	int bone_jiggle = *reinterpret_cast< int* >( uintptr_t( player ) + 0x291C );
+
+	// null bone jiggle to prevent attachments from jiggling around.
+	*reinterpret_cast< int* >( uintptr_t( player ) + 0x291C ) = 0;
+
+	// call og.
+	g_hooks.m_BuildTransformations( this, a2, a3, a4, a5, a6, a7 );
+
+	// restore bone jiggle.
+	*reinterpret_cast< int* >( uintptr_t( player ) + 0x291C ) = bone_jiggle;
+}
+
 void Hooks::StandardBlendingRules(CStudioHdr* hdr, int a3, int a4, int a5, int mask) {
 	// cast thisptr to player ptr.
 	Player* player = (Player*)this;
@@ -54,23 +71,6 @@ void Hooks::StandardBlendingRules(CStudioHdr* hdr, int a3, int a4, int a5, int m
 
 	// restore interpolation.
 	player->m_fEffects() &= ~EF_NOINTERP;
-}
-
-void Hooks::BuildTransformations( int a2, int a3, int a4, int a5, int a6, int a7 ) {
-	// cast thisptr to player ptr.
-	Player* player = ( Player* )this;
-
-	// get bone jiggle.
-	int bone_jiggle = *reinterpret_cast< int* >( uintptr_t( player ) + 0x291C );
-
-	// null bone jiggle to prevent attachments from jiggling around.
-	*reinterpret_cast< int* >( uintptr_t( player ) + 0x291C ) = 0;
-
-	// call og.
-	g_hooks.m_BuildTransformations( this, a2, a3, a4, a5, a6, a7 );
-
-	// restore bone jiggle.
-	*reinterpret_cast< int* >( uintptr_t( player ) + 0x291C ) = bone_jiggle;
 }
 
 void Hooks::UpdateClientSideAnimation( ) {
@@ -130,15 +130,15 @@ void CustomEntityListener::OnEntityCreated( Entity *ent ) {
 		        vmt->init( player );
 
 		        // hook this on every player.
-		        g_hooks.m_DoExtraBoneProcessing = vmt->add< Hooks::DoExtraBoneProcessing_t >( Player::DOEXTRABONEPROCESSING, util::force_cast( &Hooks::DoExtraBoneProcessing ) );
+				g_hooks.m_DoExtraBoneProcessing = vmt->add< Hooks::DoExtraBoneProcessing_t >(Player::DOEXTRABONEPROCESSING, util::force_cast(&Hooks::DoExtraBoneProcessing));
 				g_hooks.m_StandardBlendingRules = vmt->add< Hooks::StandardBlendingRules_t >(Player::STANDARDBLENDINGRULES, util::force_cast(&Hooks::StandardBlendingRules));
+				g_hooks.m_BuildTransformations = vmt->add< Hooks::BuildTransformations_t >(Player::BUILDTRANSFORMATIONS, util::force_cast(&Hooks::BuildTransformations));
 
 		        // local gets special treatment.
 		        if( player->index( ) == g_csgo.m_engine->GetLocalPlayer( ) ) {
 		        	g_hooks.m_UpdateClientSideAnimation = vmt->add< Hooks::UpdateClientSideAnimation_t >( Player::UPDATECLIENTSIDEANIMATION, util::force_cast( &Hooks::UpdateClientSideAnimation ) );
                     g_hooks.m_GetActiveWeapon           = vmt->add< Hooks::GetActiveWeapon_t >( Player::GETACTIVEWEAPON, util::force_cast( &Hooks::GetActiveWeapon ) );
 					g_hooks.m_CalcView = vmt->add< Hooks::CalcView_t >( 270, util::force_cast( &Hooks::CalcView ) );
-                    g_hooks.m_BuildTransformations      = vmt->add< Hooks::BuildTransformations_t >( Player::BUILDTRANSFORMATIONS, util::force_cast( &Hooks::BuildTransformations ) );
                 }
             }
         }
