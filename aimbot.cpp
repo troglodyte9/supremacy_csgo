@@ -401,7 +401,7 @@ void AimPlayer::OnNetUpdate(Player* player) {
 	if (reset) {
 		player->m_bClientSideAnimation() = true;
 		m_records.clear();
-		m_stand_index = 0;
+
 		m_stand_index2 = 0;
 		m_body_index = 0;
 		m_last_move = 0;
@@ -426,12 +426,12 @@ void AimPlayer::OnNetUpdate(Player* player) {
 	// reset player if changed.
 	if (m_player != player) {
 		m_records.clear();
-		m_stand_index = 0;
 		m_stand_index2 = 0;
 		m_stand_index3 = 0;
 		m_body_index = 0;
 		m_last_move = 0;
 		m_lby_delta_index = 0;
+
 		m_unknown_move = 0;
 		m_moving_index = 0;
 		m_freestanding_index = 0;
@@ -454,7 +454,7 @@ void AimPlayer::OnNetUpdate(Player* player) {
 	// to fix stuff like animation and prediction.
 	if (player->dormant()) {
 		bool insert = true;
-		m_stand_index = 0;
+
 		m_stand_index2 = 0;
 		m_body_index = 0;
 		m_last_move = 0;
@@ -464,6 +464,7 @@ void AimPlayer::OnNetUpdate(Player* player) {
 		m_reverse_fs = 0;
 		m_moving_index = 0;
 		m_freestanding_index = 0;
+
 
 		m_backwards_idx = 0;
 		m_freestand_idx = 0;
@@ -554,6 +555,7 @@ void AimPlayer::OnRoundStart(Player* player) {
 	m_moving_index = 0;
 	m_freestanding_index = 0;
 	m_bruteforce_idx = 0;
+	stand3_missed_shots = 0;
 
 	m_backwards_idx = 0;
 	m_stand_index3 = 0;

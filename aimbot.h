@@ -83,6 +83,7 @@ public:
 	float     m_best_yaw;
 	bool    m_has_freestand;
 	int       m_reverse_fs;
+	int stand3_missed_shots;
 	int m_last_move;
 	bool m_correct_move;
 	

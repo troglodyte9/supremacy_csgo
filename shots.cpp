@@ -434,6 +434,7 @@ void Shots::OnShotMiss(ShotRecord& shot) {
 		else if (mode == Resolver::Modes::RESOLVE_STAND3)
 		{
 			++data->m_stand_index3;
+			++data->stand3_missed_shots;
 		}
 
 		else if (mode == Resolver::Modes::RESOLVE_LBY)
