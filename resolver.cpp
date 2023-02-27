@@ -716,6 +716,7 @@ void Resolver::ResolveStand(AimPlayer* data, LagRecord* record, Player* player) 
 			}
 		}
 
+
 	
 
 		if (fabsf(last_move_delta) < 12.f
@@ -729,55 +730,6 @@ void Resolver::ResolveStand(AimPlayer* data, LagRecord* record, Player* player) 
 			record->m_mode = Modes::RESOLVE_LASTMOVE;
 			record->m_eye_angles.y = move->m_body;
 			resolver_state[record->m_player->index()] = XOR("SIDE-LASTMOVINGLBY");
-		}
-		else if (record->m_iDistorting[record->m_player->index()]) {
-			resolver_state[record->m_player->index()] = XOR("DISTORTION[U]");
-			record->m_mode = Modes::RESOLVE_BRUTEFORCE;
-			switch (data->m_missed_shots % 9)
-			{
-			case 0:
-				record->m_eye_angles.y = record->m_body;
-				resolver_state[record->m_player->index()] = "B:LBY";
-				break;
-			case 1:
-				record->m_eye_angles.y = data->m_best_angle;
-				resolver_state[record->m_player->index()] = "B:FREESTAND";
-				if (math::AngleDiff(record->m_body, away + 180.0f) <= 25.f) {
-					record->m_eye_angles.y = away + 180.0f;
-					resolver_state[record->m_player->index()] = "B:BACKWARDS";
-				}
-				break;
-			case 2:
-				record->m_eye_angles.y = away + 90.0f;
-				resolver_state[record->m_player->index()] = "B:RIGHT";
-				break;
-			case 3:
-				record->m_eye_angles.y = away - 90.0f;
-				resolver_state[record->m_player->index()] = "B:LEFT";
-				break;
-			case 4:
-				record->m_eye_angles.y = away + 45.0f;
-				resolver_state[record->m_player->index()] = "B:SRIGHT";
-				break;
-			case 5:
-				record->m_eye_angles.y = away - 45.0f;
-				resolver_state[record->m_player->index()] = "B:SLEFT";
-				break;
-			case 6:
-				record->m_eye_angles.y = away + 135.0f;
-				resolver_state[record->m_player->index()] = "B:SBACKWARDS";
-				break;
-			case 7:
-				record->m_eye_angles.y = away - 135.0f;
-				resolver_state[record->m_player->index()] = "B:SFORWARDS";
-				break;
-			case 8:
-				record->m_eye_angles.y = data->m_best_angle;
-				resolver_state[record->m_player->index()] = "B:FREESTAND";
-				break;
-			default:
-				break;
-			}
 		}
 		else if (data->m_stand_index && g_hvh.DoEdgeAntiAim(data->m_player, ang)) 
 		{
