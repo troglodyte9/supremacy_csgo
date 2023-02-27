@@ -795,50 +795,50 @@ void Resolver::ResolveStand(AimPlayer* data, LagRecord* record, Player* player) 
 			}
 		}
 
-		
-	}
+		if (!record->m_fake_walk && data->m_body_index <= 2) {
+			record->m_mode = Modes::RESOLVE_BODY;
 
-	if (!record->m_fake_walk && data->m_body_index <= 2) {
-		record->m_mode = Modes::RESOLVE_BODY;
+			// body updated.
+			if ((math::AngleDiff(previous_record->m_body, record->m_body) > 30.f)) {
 
-		// body updated.
-		if ((math::AngleDiff(previous_record->m_body, record->m_body) > 30.f)) {
+				// set the resolve mode.
+				resolver_state[player->index()] = "LBYUPD";
 
-			// set the resolve mode.
-			resolver_state[player->index()] = "LBYUPD";
+				// update their old body.
+				data->m_old_body = record->m_body;
 
-			// update their old body.
-			data->m_old_body = record->m_body;
+				// set angles to current LBY.
+				record->m_eye_angles.y = record->m_body;
+				iPlayers[player->index()] = false;
 
-			// set angles to current LBY.
-			record->m_eye_angles.y = record->m_body;
-			iPlayers[player->index()] = false;
+				// delay body update.
+				data->m_body_update = record->m_anim_time + 1.1f;
+				data->m_has_body_updated = true;
 
-			// delay body update.
-			data->m_body_update = record->m_anim_time + 1.1f;
-			data->m_has_body_updated = true;
+				// we've seen them update.
+				// exit out of the resolver, thats it.
+				return;
+			}
 
-			// we've seen them update.
-			// exit out of the resolver, thats it.
-			return;
-		}
+			// lby should have updated here.
+			if (data->m_has_body_updated && (record->m_anim_time >= data->m_body_update)) {
+				resolver_state[player->index()] = "LBYPRED";
 
-		// lby should have updated here.
-		if (data->m_has_body_updated && (record->m_anim_time >= data->m_body_update)) {
-			resolver_state[player->index()] = "LBYPRED";
+				// set angles to current LBY.
+				record->m_eye_angles.y = record->m_body;
 
-			// set angles to current LBY.
-			record->m_eye_angles.y = record->m_body;
+				// predict next body update.
+				data->m_body_update = record->m_anim_time + 1.1f;
 
-			// predict next body update.
-			data->m_body_update = record->m_anim_time + 1.1f;
+				iPlayers[player->index()] = false;
 
-			iPlayers[player->index()] = false;
-
-			// exit out of the resolver, thats it.
-			return;
+				// exit out of the resolver, thats it.
+				return;
+			}
 		}
 	}
+
+	
 
 	/*switch (data->m_missed_shots % 4)
 	{
