@@ -768,7 +768,7 @@ void Resolver::ResolveStand(AimPlayer* data, LagRecord* record, Player* player) 
 			resolver_state[player->index()] = "REVERSEFS";
 			record->m_eye_angles.y = data->m_best_angle;
 		}
-		else if (data->m_lastmove_idx >= 1 || data->m_reverse_fs < 1 && IsYawSideways(player, move->m_body))
+		else if (!(data->m_correct_move && data->m_lastmove_idx < 1) && (data->m_reverse_fs > 1 && IsYawSideways(player, move->m_body)))
 		{
 			//set resolve mode
 			record->m_mode = Modes::RESOLVE_STAND2;

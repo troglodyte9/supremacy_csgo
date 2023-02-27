@@ -449,6 +449,7 @@ void Shots::OnShotMiss(ShotRecord& shot) {
 		else if (mode == Resolver::Modes::RESOLVE_REVERSEFS){
 			++data->m_reverse_fs;
 		}
+
 		else if (mode == Resolver::Modes::RESOLVE_LASTMOVE)
 		{
 			++data->m_lastmove_idx;
