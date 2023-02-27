@@ -1,4 +1,4 @@
-#pragma once
+h#pragma once
 
 // pre-declare.
 class LagRecord;
@@ -77,6 +77,11 @@ public:
 	BoneArray* m_bones;
 
 	// lagfix stuff.
+	bool m_iDistorting[65];
+	int m_iDistortCheck;
+	bool m_iRestartDistortCheck;
+	bool m_iFirstCheck;
+	float m_iDistortTiming;
 	bool   m_broke_lc;
 	vec3_t m_pred_origin;
 	vec3_t m_pred_velocity;

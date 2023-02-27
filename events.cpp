@@ -106,7 +106,7 @@ void events::player_hurt( IGameEvent* evt ) {
 			float damage = evt->m_keys->FindKey(HASH("dmg_health"))->GetInt();
 			int hp = evt->m_keys->FindKey(HASH("health"))->GetInt();
 
-			g_notify.add(tfm::format(XOR("Got hit by %s in the %s for %i damage (%i health remaining)\n"), name, g_shots.m_groups[evt->m_keys->FindKey(HASH("hitgroup"))->GetInt()], damage, hp));
+		//	g_notify.add(tfm::format(XOR("Got hit by %s in the %s for %i damage (%i health remaining)\n"), name, g_shots.m_groups[evt->m_keys->FindKey(HASH("hitgroup"))->GetInt()], damage, hp));
 		}
 
 		// a player damaged the local player.

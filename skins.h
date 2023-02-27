@@ -27,14 +27,14 @@ struct KnifeData {
 	std::string m_model, m_world_model, m_name;
 	int         m_model_index, m_world_model_index;
 
-	__forceinline KnifeData( ) : m_id{}, m_model{}, m_world_model{}, m_name {}, m_model_index{}, m_world_model_index{} {}
+	__forceinline KnifeData() : m_id{}, m_model{}, m_world_model{}, m_name{}, m_model_index{}, m_world_model_index{} {}
 
-	__forceinline void setup( int id, const std::string& model, const std::string& world_model, const std::string& name ) {
-		m_id                = id;
-		m_model             = model;
-		m_name              = name;
-		m_model_index       = g_csgo.m_model_info->GetModelIndex( model.data( ) );
-		m_world_model_index = g_csgo.m_model_info->GetModelIndex( world_model.data( ) );
+	__forceinline void setup(int id, const std::string& model, const std::string& world_model, const std::string& name) {
+		m_id = id;
+		m_model = model;
+		m_name = name;
+		m_model_index = g_csgo.m_model_info->GetModelIndex(model.data());
+		m_world_model_index = g_csgo.m_model_info->GetModelIndex(world_model.data());
 	}
 };
 
@@ -43,14 +43,14 @@ struct GloveData {
 	std::string m_model, m_world_model;
 	int         m_model_index, m_world_model_index;
 
-	__forceinline GloveData( ) : m_id{}, m_model{}, m_model_index{} {}
+	__forceinline GloveData() : m_id{}, m_model{}, m_model_index{} {}
 
-	__forceinline void setup( int id, const std::string& model, const std::string& world_model ) {
-		m_id                = id;
-		m_model             = model;
-		m_world_model       = world_model;
-		m_model_index       = g_csgo.m_model_info->GetModelIndex( model.data( ) );
-		m_world_model_index = g_csgo.m_model_info->GetModelIndex( world_model.data( ) );
+	__forceinline void setup(int id, const std::string& model, const std::string& world_model) {
+		m_id = id;
+		m_model = model;
+		m_world_model = world_model;
+		m_model_index = g_csgo.m_model_info->GetModelIndex(model.data());
+		m_world_model_index = g_csgo.m_model_info->GetModelIndex(world_model.data());
 	}
 };
 
@@ -60,7 +60,7 @@ public:
 		BAYONET = 1,
 		BOWIE,
 		BUTTERFLY,
-		FALCHION ,
+		FALCHION,
 		FLIP,
 		GUT,
 		HUNTSMAN,
@@ -81,18 +81,18 @@ public:
 	};
 
 public:
-	KnifeData   m_knife_data[ knives_t::KNIFE_MAX ];
-	GloveData   m_glove_data[ gloves_t::GLOVE_MAX ];
+	KnifeData   m_knife_data[knives_t::KNIFE_MAX];
+	GloveData   m_glove_data[gloves_t::GLOVE_MAX];
 	int         m_last_seq;
 	CBaseHandle m_glove_handle;
 	bool        m_update;
 	float       m_update_time;
 
 public:
-	void load( );
-	void think( );
-	void UpdateItem( Weapon* item );
-	void UpdateAnimations( Entity* ent );
+	void load();
+	void think();
+	void UpdateItem(Weapon* item);
+	void UpdateAnimations(Entity* ent);
 };
 
 extern Skins g_skins;

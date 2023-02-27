@@ -105,4 +105,4 @@ bool Animations::IsYawDistorting(AimPlayer* data, LagRecord* record, LagRecord* 
 	}
 
 	return false;
-}
+}	
