@@ -123,7 +123,7 @@ void Visuals::ThirdpersonThink( ) {
 		math::AngleVectors( offset, &forward );
 
 		// cam_idealdist convar.
-		offset.z = 150.f;
+		offset.z = g_csgo.m_cvar->FindVar(HASH("cam_idealdist"))->GetFloat();
 
 		// start pos.
 		origin = g_cl.m_shoot_pos;
@@ -272,6 +272,9 @@ void Visuals::ManualAntiAim() {
 }
 
 void Visuals::Hitmarker( ) {
+
+	static auto cross = g_csgo.m_cvar->FindVar(HASH("weapon_debug_spread_show"));
+	cross->SetValue(g_menu.main.visuals.force_xhair.get() && !g_cl.m_local->m_bIsScoped() ? 3 : 0); // force crosshair
 	if( !g_menu.main.misc.hitmarker.get( ) )
 		return;
 

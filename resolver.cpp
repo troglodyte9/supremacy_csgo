@@ -160,8 +160,6 @@ void Resolver::ResolveAngles(Player* player, LagRecord* record) {
 	if (g_menu.main.config.mode.get() == 1)
 		record->m_eye_angles.x = 90.f;
 
-
-
 	// we arrived here we can do the acutal resolve.
 	if (record->m_mode == Modes::RESOLVE_WALK && !g_input.GetKeyState(g_menu.main.aimbot.override.get()))
 		ResolveWalk(data, record, player);
@@ -178,74 +176,6 @@ void Resolver::ResolveAngles(Player* player, LagRecord* record) {
 
 	else if (record->m_mode == Modes::RESOLVE_UNKNOWM && !g_input.GetKeyState(g_menu.main.aimbot.override.get()))
 		GetDirectionAngle(player->index(), player, record);
-
-	//PredictBodyUpdates(player, record);
-
-
-	static bool m_iFirstCheck = true;
-	static bool m_iRestartDistortCheck = true;
-	static int m_iDistortCheck = 0;
-	static int m_iResetCheck = 0;
-	static float m_flLastDistortTime = 0.f;
-	static float m_flMaxDistortTime = g_csgo.m_globals->m_curtime + 0.10f;
-	static float m_flLastResetTime = 0.f;
-	static float m_flMaxResetTime = g_csgo.m_globals->m_curtime + 0.85f;
-	static bool sugma = false;
-	static bool balls = false;
-
-	if ((m_iRestartDistortCheck || m_iFirstCheck) && g_cl.m_local->alive()) {
-		record->m_iDistortTiming = g_csgo.m_globals->m_curtime + 0.15f;
-		m_iRestartDistortCheck = false;
-		m_iFirstCheck = false;
-	}
-
-	if ((player->m_AnimOverlay()[3].m_weight == 0.f && player->m_AnimOverlay()[3].m_cycle == 0.f) &&
-		player->m_vecVelocity().length() < 0.1f && !m_iRestartDistortCheck) {
-		if (!sugma) {
-			m_flMaxDistortTime = g_csgo.m_globals->m_curtime + 0.10f;
-			sugma = true;
-		}
-
-		m_flLastDistortTime = g_csgo.m_globals->m_curtime;
-
-		if (m_flLastDistortTime >= m_flMaxDistortTime) {
-			m_iDistortCheck++;
-			m_iResetCheck = 0;
-			sugma = false;
-		}
-	}
-	else {
-		sugma = false;
-	}
-
-	if (player->m_AnimOverlay()[3].m_cycle >= 0.1f && player->m_AnimOverlay()[3].m_cycle <= 0.99999f && player->m_vecVelocity().length_2d() < 0.01f && record->m_velocity.length_2d() < 0.1f) {
-		if (!balls) {
-			m_flMaxResetTime = g_csgo.m_globals->m_curtime + 0.85f;
-			balls = true;
-		}
-
-		m_flLastResetTime = g_csgo.m_globals->m_curtime;
-
-		if (m_flLastResetTime >= m_flMaxResetTime) {
-			m_iResetCheck++;
-			balls = false;
-		}
-	}
-	else {
-		balls = false;
-	}
-
-
-	if (m_iResetCheck >= 3) {
-		m_iRestartDistortCheck = true;
-		m_iDistortCheck = 0;
-		record->m_iDistorting[player->index()] = false;
-	}
-
-	if (m_iDistortCheck >= 2) {
-		record->m_iDistorting[player->index()] = true;
-	}
-
 
 //data->resolver_mode = XOR("ANTIFREESTAND");  // was walking antifreestand
 // resolver_state[record->m_player->index()] = "FS";
