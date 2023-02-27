@@ -287,7 +287,7 @@ void HVH::GetAntiAimDirection( ) {
 	if (g_hvh.m_right)
 		m_direction = m_view - 118.f;
 	if (g_hvh.m_back)
-		m_direction = m_view + 165.f;
+		m_direction = m_view + 150.f;
 
 	// normalize the direction.
 	math::NormalizeAngle( m_direction );

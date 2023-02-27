@@ -640,6 +640,17 @@ bool IsYawSideways(Player* entity, float yaw)
 	return delta > 44.f && delta < 135.f;
 }
 
+bool IsYawSidewaysHigh(Player* entity, float yaw)
+{
+	const float delta =
+		fabs(math::NormalizedAngle((math::CalcAngle(g_cl.m_local->m_vecOrigin(),
+			entity->m_vecOrigin()).y)
+			- yaw));
+
+	return delta > 25.f && delta < 165.f;
+}
+
+
 void Resolver::ResolveStand(AimPlayer* data, LagRecord* record, Player* player) {
 
 	data->m_moved = false;
@@ -739,6 +750,8 @@ void Resolver::ResolveStand(AimPlayer* data, LagRecord* record, Player* player) 
 			}
 		}
 
+
+
 		
 		if (fabsf(last_move_delta) < 12.f
 			&& can_last_move)
@@ -761,14 +774,14 @@ void Resolver::ResolveStand(AimPlayer* data, LagRecord* record, Player* player) 
 			record->m_eye_angles.y = ang.y;
 			resolver_state[record->m_player->index()] = "EDGE";
 		}
-		else if ((data->m_reverse_fs < 1 && IsYawSideways(player, move->m_body)))
+		else if ((data->m_reverse_fs < 1 && IsYawSidewaysHigh(player, move->m_body)))
 		{
 			//reversefs
 			record->m_mode = Modes::RESOLVE_REVERSEFS;
 			resolver_state[player->index()] = "REVERSEFS";
 			record->m_eye_angles.y = data->m_best_angle;
 		}
-		else if ((data->m_reverse_fs > 1 && IsYawSideways(player, move->m_body)))
+		else if ((data->m_reverse_fs > 1 && IsYawSidewaysHigh(player, move->m_body)))
 		{
 			//set resolve mode
 			record->m_mode = Modes::RESOLVE_STAND2;
