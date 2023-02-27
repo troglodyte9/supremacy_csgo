@@ -1081,13 +1081,6 @@ void Visuals::DrawPlayer( Player* player ) {
 						flags.push_back({ XOR("DT"), {255, 255, 255, low_alpha} });
 				}
 			}
-
-			if (*rage_items == 2) {
-				LagRecord* record;
-				if (record->m_iDistorting(player->index())) {
-
-				}
-			}
 		}
 		// iterate flags.
 		for( size_t i{ }; i < flags.size( ); ++i ) {

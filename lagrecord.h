@@ -1,4 +1,4 @@
-h#pragma once
+#pragma once
 
 // pre-declare.
 class LagRecord;
