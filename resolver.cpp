@@ -110,11 +110,11 @@ void Resolver::MatchShot(AimPlayer* data, LagRecord* record) {
 
 		// more then 1 choke, cant hit pitch, apply prev pitch.
 		else if (data->m_records.size() >= 2) {
-			LagRecord* previous = data->m_records[1].get();
+			/** previous = data->m_records[1].get();
 
 			if (previous && !previous->dormant())
 				record->m_eye_angles.x = previous->m_eye_angles.x;
-			resolver_state[record->m_player->index()] = "EXPERIMENTAL";
+				resolver_state[record->m_player->index()] = "EXPERIMENTAL";*/
 			return;
 		}
 		resolver_state[record->m_player->index()] = "RECORDING ENEMY SHOT";
@@ -418,7 +418,10 @@ void Resolver::FindBestAngle(LagRecord* record, AimPlayer* data) {
 	std::vector< AdaptiveAngle > angles{ };
 	angles.emplace_back(away - 180.f);
 	angles.emplace_back(away + 90.f);
-	angles.emplace_back(away - 90.f);
+	angles.emplace_back(away - 90.f);	
+	angles.emplace_back(away + 165.f);
+	angles.emplace_back(away - 165.f);
+
 
 
 	// start the trace at the your shoot pos.
@@ -636,26 +639,82 @@ void Resolver::ResolveStand(AimPlayer* data, LagRecord* record, Player* player) 
 
 	// we have no known lastmove, let's just bruteforce
 	if (!data->m_moved) {
-		record->m_mode = Modes::RESOLVE_STAND3;
-		resolver_state[player->index()] = "BRUTEFORCE";
-		switch (data->m_stand_index3 % 5) {
-		case 0:
-			record->m_eye_angles.y = data->m_best_angle;
-			break;
-		case 1:
-			record->m_eye_angles.y = away + 180.f;
-			break;
-		case 2:
-			record->m_eye_angles.y = move->m_body + 110.f;
-			break;
-		case 3:
-			record->m_eye_angles.y = move->m_body - 110.f;
-			break;
-		case 4:
-			record->m_eye_angles.y = away + 180.f;
-			break;
-		default:
-			break;
+		if (!g_animations.IsYawDistorting(data, record, previous_record)) {
+			record->m_mode = Modes::RESOLVE_STAND3;
+			resolver_state[player->index()] = "BRUTE";
+			switch (data->m_stand_index3 % 5) {
+			case 0:
+				record->m_eye_angles.y = data->m_best_angle;
+				resolver_state[player->index()] += "[FS]";
+				break;
+			case 1:
+				record->m_eye_angles.y = away + 180.f;
+				resolver_state[player->index()] += "[1]";
+				break;
+			case 2:
+				record->m_eye_angles.y = move->m_body + 110.f;
+				resolver_state[player->index()] += "[2]";
+				break;
+			case 3:
+				record->m_eye_angles.y = move->m_body - 110.f;
+				resolver_state[player->index()] += "[3]";
+				break;
+			case 4:
+				record->m_eye_angles.y = away + 180.f;
+				resolver_state[player->index()] += "[4]";
+				break;
+			default:
+				break;
+			}
+		}
+		else if (g_animations.IsYawDistorting(data, record, previous_record)) {
+			resolver_state[record->m_player->index()] = XOR("DISTORTION[U]");
+			record->m_mode = Modes::RESOLVE_BRUTEFORCE;
+			switch (data->m_bruteforce_idx % 9)
+			{
+			case 0:
+				record->m_eye_angles.y = record->m_body;
+				resolver_state[record->m_player->index()] = "B:LBY";
+				break;
+			case 1:
+				record->m_eye_angles.y = data->m_best_angle;
+				resolver_state[record->m_player->index()] = "B:FREESTAND";
+				if (math::AngleDiff(record->m_body, away + 180.0f) <= 25.f) {
+					record->m_eye_angles.y = away + 180.0f;
+					resolver_state[record->m_player->index()] = "B:BACKWARDS";
+				}
+				break;
+			case 2:
+				record->m_eye_angles.y = away + 90.0f;
+				resolver_state[record->m_player->index()] = "B:RIGHT";
+				break;
+			case 3:
+				record->m_eye_angles.y = away - 90.0f;
+				resolver_state[record->m_player->index()] = "B:LEFT";
+				break;
+			case 4:
+				record->m_eye_angles.y = away + 45.0f;
+				resolver_state[record->m_player->index()] = "B:SRIGHT";
+				break;
+			case 5:
+				record->m_eye_angles.y = away - 45.0f;
+				resolver_state[record->m_player->index()] = "B:SLEFT";
+				break;
+			case 6:
+				record->m_eye_angles.y = away + 135.0f;
+				resolver_state[record->m_player->index()] = "B:SBACKWARDS";
+				break;
+			case 7:
+				record->m_eye_angles.y = away - 135.0f;
+				resolver_state[record->m_player->index()] = "B:SFORWARDS";
+				break;
+			case 8:
+				record->m_eye_angles.y = data->m_best_angle;
+				resolver_state[record->m_player->index()] = "B:FREESTAND";
+				break;
+			default:
+				break;
+			}
 		}
 	} else if (data->m_moved) {
 		float diff = math::NormalizedAngle(record->m_body - move->m_body);
@@ -732,7 +791,7 @@ void Resolver::ResolveStand(AimPlayer* data, LagRecord* record, Player* player) 
 
 		}
 		else {
-			if (!data->m_has_freestand) {
+			if (!IsYawSideways(player, move->m_body)) {
 				record->m_eye_angles.y = away + 180.f; // backward
 				resolver_state[player->index()] = "BACKWARD";
 			}
