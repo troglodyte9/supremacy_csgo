@@ -2,15 +2,14 @@
 
 class ShotRecord {
 public:
-	__forceinline ShotRecord() : m_target{}, m_record{}, m_time{}, m_lat{}, m_damage{}, m_pos{}, m_matched{}, m_hurt{} {}
+	__forceinline ShotRecord() : m_target{}, m_record{}, m_time{}, m_lat{}, m_damage{}, m_range{}, m_pos{}, m_impact_pos{}, m_confirmed{}, m_hurt{}, m_impacted{} {}
 
 public:
 	Player* m_target;
 	LagRecord* m_record;
-	float      m_time, m_lat, m_damage;
-	vec3_t     m_pos;
-	bool       m_matched, m_hurt;
-	int		   m_hitbox;
+	float      m_time, m_lat, m_damage, m_range;
+	vec3_t     m_pos, m_impact_pos;
+	bool       m_confirmed, m_hurt, m_impacted;
 };
 
 class VisualImpactData_t {
@@ -44,28 +43,29 @@ public:
 	float         m_damage;
 };
 
+
 class Shots {
-
-public:
-	void OnShotFire(Player* target, float damage, int bullets, LagRecord* record, int hitbox);
-	void OnImpact(IGameEvent* evt);
-	void OnHurt(IGameEvent* evt);
-
-public:
-	std::array< std::string, 11 > m_groups = {
-   XOR("body"),
-   XOR("head"),
-   XOR("chest"),
-   XOR("stomach"),
-   XOR("left arm"),
-   XOR("right arm"),
-   XOR("left leg"),
-   XOR("right leg"),
-   XOR("neck"),
-   XOR("unknown"),
-   XOR("gear")
+private:
+	std::array< std::string, 8 > m_groups = {
+		XOR("body"),
+		XOR("head"),
+		XOR("chest"),
+		XOR("stomach"),
+		XOR("left arm"),
+		XOR("right arm"),
+		XOR("left leg"),
+		XOR("right leg")
 	};
 
+public:
+	void OnShotFire(Player* target, float damage, int bullets, LagRecord* record);
+	void OnImpact(IGameEvent* evt);
+	void OnHurt(IGameEvent* evt);
+	void OnWeaponFire(IGameEvent* evt);
+	void OnShotMiss(ShotRecord& shot);
+	void Think();
+
+public:
 	std::deque< ShotRecord >          m_shots;
 	std::vector< VisualImpactData_t > m_vis_impacts;
 	std::deque< ImpactRecord >        m_impacts;

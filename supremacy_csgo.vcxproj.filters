@@ -243,9 +243,6 @@
     <ClInclude Include="resolver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="skins.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="events.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -259,9 +256,6 @@
       <Filter>Header Files\menu</Filter>
     </ClInclude>
     <ClInclude Include="matchframework.h">
-      <Filter>Header Files\sdk</Filter>
-    </ClInclude>
-    <ClInclude Include="hud.h">
       <Filter>Header Files\sdk</Filter>
     </ClInclude>
     <ClInclude Include="tinyformat.h">
@@ -316,6 +310,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ServerSound.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="skins.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -440,9 +437,6 @@
     <ClCompile Include="modelrender.cpp">
       <Filter>Source Files\hooks\game</Filter>
     </ClCompile>
-    <ClCompile Include="skins.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="events.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -480,6 +474,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ServerSound.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="skins.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

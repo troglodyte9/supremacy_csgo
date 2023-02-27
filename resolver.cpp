@@ -182,6 +182,71 @@ void Resolver::ResolveAngles(Player* player, LagRecord* record) {
 	//PredictBodyUpdates(player, record);
 
 
+	static bool m_iFirstCheck = true;
+	static bool m_iRestartDistortCheck = true;
+	static int m_iDistortCheck = 0;
+	static int m_iResetCheck = 0;
+	static float m_flLastDistortTime = 0.f;
+	static float m_flMaxDistortTime = g_csgo.m_globals->m_curtime + 0.10f;
+	static float m_flLastResetTime = 0.f;
+	static float m_flMaxResetTime = g_csgo.m_globals->m_curtime + 0.85f;
+	static bool sugma = false;
+	static bool balls = false;
+
+	if ((m_iRestartDistortCheck || m_iFirstCheck) && g_cl.m_local->alive()) {
+		record->m_iDistortTiming = g_csgo.m_globals->m_curtime + 0.15f;
+		m_iRestartDistortCheck = false;
+		m_iFirstCheck = false;
+	}
+
+	if ((player->m_AnimOverlay()[3].m_weight == 0.f && player->m_AnimOverlay()[3].m_cycle == 0.f) &&
+		player->m_vecVelocity().length() < 0.1f && !m_iRestartDistortCheck) {
+		if (!sugma) {
+			m_flMaxDistortTime = g_csgo.m_globals->m_curtime + 0.10f;
+			sugma = true;
+		}
+
+		m_flLastDistortTime = g_csgo.m_globals->m_curtime;
+
+		if (m_flLastDistortTime >= m_flMaxDistortTime) {
+			m_iDistortCheck++;
+			m_iResetCheck = 0;
+			sugma = false;
+		}
+	}
+	else {
+		sugma = false;
+	}
+
+	if (player->m_AnimOverlay()[3].m_cycle >= 0.1f && player->m_AnimOverlay()[3].m_cycle <= 0.99999f && player->m_vecVelocity().length_2d() < 0.01f && record->m_velocity.length_2d() < 0.1f) {
+		if (!balls) {
+			m_flMaxResetTime = g_csgo.m_globals->m_curtime + 0.85f;
+			balls = true;
+		}
+
+		m_flLastResetTime = g_csgo.m_globals->m_curtime;
+
+		if (m_flLastResetTime >= m_flMaxResetTime) {
+			m_iResetCheck++;
+			balls = false;
+		}
+	}
+	else {
+		balls = false;
+	}
+
+
+	if (m_iResetCheck >= 3) {
+		m_iRestartDistortCheck = true;
+		m_iDistortCheck = 0;
+		record->m_iDistorting[player->index()] = false;
+	}
+
+	if (m_iDistortCheck >= 2) {
+		record->m_iDistorting[player->index()] = true;
+	}
+
+
 //data->resolver_mode = XOR("ANTIFREESTAND");  // was walking antifreestand
 // resolver_state[record->m_player->index()] = "FS";
    // normalize the eye angles, doesn't really matter but its clean.
@@ -421,8 +486,10 @@ void Resolver::FindBestAngle(LagRecord* record, AimPlayer* data) {
 
 	// construct vector of angles to test.
 	std::vector< AdaptiveAngle > angles{ };
+	angles.emplace_back(away - 180.f);
 	angles.emplace_back(away + 90.f);
 	angles.emplace_back(away - 90.f);
+
 
 	// start the trace at the your shoot pos.
 	vec3_t start = g_cl.m_local->GetShootPosition();
@@ -623,6 +690,7 @@ void Resolver::ResolveStand(AimPlayer* data, LagRecord* record, Player* player) 
 		}
 	}
 
+	ang_t ang;
 	bool breaking = CheckLBY(data->m_player, record, FindLastRecord(data));
 	// a valid moving context was found
 	if (data->m_moved) {
@@ -639,28 +707,30 @@ void Resolver::ResolveStand(AimPlayer* data, LagRecord* record, Player* player) 
 
 		bool can_last_move = data->m_correct_move && data->m_lastmove_idx < 1;
 
-		/*if (record->m_fake_walk) {
+		if (record->m_fake_walk) {
 			{
 				record->m_mode = Modes::RESOLVE_FAKEWALK;
 				record->m_eye_angles.y = record->m_body;
 				resolver_state[record->m_player->index()] = XOR("FAKEWALK");
 				return;
 			}
-		}*/
+		}
+
+	
 
 		if (fabsf(last_move_delta) < 12.f
 			&& can_last_move)
 		{
 			record->m_mode = Modes::RESOLVE_LASTMOVE;
 			record->m_eye_angles.y = move->m_body;
-			resolver_state[record->m_player->index()] = XOR("LASTMOVE");
+			resolver_state[record->m_player->index()] = XOR("LASTMOVINGLBY");
 		}
 		else if (IsYawSideways(player, move->m_body) && fabsf(last_move_delta) <= 15.f && can_last_move) {
 			record->m_mode = Modes::RESOLVE_LASTMOVE;
 			record->m_eye_angles.y = move->m_body;
-			resolver_state[record->m_player->index()] = XOR("SIDE-LASTMOVE");
+			resolver_state[record->m_player->index()] = XOR("SIDE-LASTMOVINGLBY");
 		}
-		else if (g_animations.IsYawDistorting(data, record, previous_record)) {
+		else if (record->m_iDistorting[record->m_player->index()]) {
 			resolver_state[record->m_player->index()] = XOR("DISTORTION[U]");
 			record->m_mode = Modes::RESOLVE_BRUTEFORCE;
 			switch (data->m_missed_shots % 9)
@@ -708,6 +778,11 @@ void Resolver::ResolveStand(AimPlayer* data, LagRecord* record, Player* player) 
 			default:
 				break;
 			}
+		}
+		else if (data->m_stand_index && g_hvh.DoEdgeAntiAim(data->m_player, ang)) 
+		{
+			record->m_eye_angles.y = ang.y;
+			resolver_state[record->m_player->index()] = "EDGE";
 		}
 		else {
 			if (!data->m_has_freestand) {
