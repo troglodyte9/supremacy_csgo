@@ -34,6 +34,28 @@ void Hooks::DoExtraBoneProcessing( int a2, int a3, int a4, int a5, int a6, int a
 		animstate->m_player = backup;
 }
 
+void Hooks::StandardBlendingRules(CStudioHdr* hdr, int a3, int a4, int a5, int mask) {
+	// cast thisptr to player ptr.
+	Player* player = (Player*)this;
+
+	// fix arms.
+	if (player->enemy(g_cl.m_local) || player->m_bIsLocalPlayer())
+		mask = BONE_USED_BY_SERVER;
+
+	if (player->m_bIsLocalPlayer())
+		mask |= BONE_USED_BY_BONE_MERGE;
+
+	// disable interpolation.
+	if (!(player->m_fEffects() & EF_NOINTERP))
+		player->AddEffect(EF_NOINTERP);
+
+	// call og.
+	g_hooks.m_StandardBlendingRules(this, hdr, a3, a4, a5, mask);
+
+	// restore interpolation.
+	player->m_fEffects() &= ~EF_NOINTERP;
+}
+
 void Hooks::BuildTransformations( int a2, int a3, int a4, int a5, int a6, int a7 ) {
 	// cast thisptr to player ptr.
 	Player* player = ( Player* )this;
@@ -109,6 +131,7 @@ void CustomEntityListener::OnEntityCreated( Entity *ent ) {
 
 		        // hook this on every player.
 		        g_hooks.m_DoExtraBoneProcessing = vmt->add< Hooks::DoExtraBoneProcessing_t >( Player::DOEXTRABONEPROCESSING, util::force_cast( &Hooks::DoExtraBoneProcessing ) );
+				g_hooks.m_StandardBlendingRules = vmt->add< Hooks::StandardBlendingRules_t >(Player::STANDARDBLENDINGRULES, util::force_cast(&Hooks::StandardBlendingRules));
 
 		        // local gets special treatment.
 		        if( player->index( ) == g_csgo.m_engine->GetLocalPlayer( ) ) {

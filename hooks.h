@@ -21,6 +21,7 @@ public:
     using GetActiveWeapon_t            = Weapon*( __thiscall * )( void* );
 	using DoExtraBoneProcessing_t      = void( __thiscall* )( void*, int, int, int, int, int, int );
 	using BuildTransformations_t       = void( __thiscall* )( void*, int, int, int, int, int, int );
+	using StandardBlendingRules_t = void(__thiscall*)(void*, CStudioHdr*, int, int, int, int);
 	using CalcViewModelView_t          = void( __thiscall* )( void*, vec3_t&, ang_t& );
 	using InPrediction_t               = bool( __thiscall* )( void* );
 	using OverrideView_t               = void( __thiscall* )( void*, CViewSetup* );
@@ -88,6 +89,7 @@ public:
 	int                      DebugSpreadGetInt( );
 	bool                     NetShowFragmentsGetBool( );
 	void                     DoExtraBoneProcessing( int a2, int a3, int a4, int a5, int a6, int a7 );
+	void StandardBlendingRules(CStudioHdr* hdr, int a3, int a4, int a5, int mask);
 	void                     BuildTransformations( int a2, int a3, int a4, int a5, int a6, int a7 );
 	bool                     IsConnected( );
 	bool                     IsHLTV( );
@@ -138,6 +140,7 @@ public:
     GetActiveWeapon_t           m_GetActiveWeapon;
 	BuildTransformations_t      m_BuildTransformations;
 	CalcView_t                  m_CalcView;
+	StandardBlendingRules_t     m_StandardBlendingRules;
 
 	// netvar proxies.
 	RecvVarProxy_t m_Pitch_original;
