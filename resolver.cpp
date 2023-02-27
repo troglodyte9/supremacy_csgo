@@ -692,8 +692,31 @@ void Resolver::ResolveStand(AimPlayer* data, LagRecord* record, Player* player) 
 
 	ang_t ang;
 	bool breaking = CheckLBY(data->m_player, record, FindLastRecord(data));
-	// a valid moving context was found
-	if (data->m_moved) {
+
+	// we have no known lastmove, let's just bruteforce
+	if (!data->m_moved) {
+		record->m_mode = Modes::RESOLVE_STAND3;
+		resolver_state[player->index()] = "BRUTEFORCE";
+		switch (data->m_stand_index3 % 5) {
+		case 0:
+			record->m_eye_angles.y = data->m_best_angle;
+			break;
+		case 1:
+			record->m_eye_angles.y = away + 180.f;
+			break;
+		case 2:
+			record->m_eye_angles.y = move->m_body + 110.f;
+			break;
+		case 3:
+			record->m_eye_angles.y = move->m_body - 110.f;
+			break;
+		case 4:
+			record->m_eye_angles.y = away + 180.f;
+			break;
+		default:
+			break;
+		}
+	} else if (data->m_moved) {
 		float diff = math::NormalizedAngle(record->m_body - move->m_body);
 		float delta = record->m_anim_time - move->m_anim_time;
 		const Directions direction = HandleDirections(data);
@@ -716,81 +739,106 @@ void Resolver::ResolveStand(AimPlayer* data, LagRecord* record, Player* player) 
 			}
 		}
 
-
-	
-
+		
 		if (fabsf(last_move_delta) < 12.f
 			&& can_last_move)
 		{
+			// normal lastmove
 			record->m_mode = Modes::RESOLVE_LASTMOVE;
 			record->m_eye_angles.y = move->m_body;
 			resolver_state[record->m_player->index()] = XOR("LASTMOVINGLBY");
 		}
 		else if (IsYawSideways(player, move->m_body) && fabsf(last_move_delta) <= 15.f && can_last_move) {
 			record->m_mode = Modes::RESOLVE_LASTMOVE;
+			/// sideways lastmove
 			record->m_eye_angles.y = move->m_body;
 			resolver_state[record->m_player->index()] = XOR("SIDE-LASTMOVINGLBY");
 		}
-		else if (data->m_stand_index && g_hvh.DoEdgeAntiAim(data->m_player, ang)) 
+		else if (data->m_stand_index == 0 && g_hvh.DoEdgeAntiAim(data->m_player, ang)) 
 		{
+			//enemy is edging
+			record->m_mode = Modes::RESOLVE_EDGE;
 			record->m_eye_angles.y = ang.y;
 			resolver_state[record->m_player->index()] = "EDGE";
 		}
+		else if (data->m_lastmove_idx < 1 && (data->m_reverse_fs < 1 && IsYawSideways(player, move->m_body)))
+		{
+			//reversefs
+			record->m_mode = Modes::RESOLVE_REVERSEFS;
+			resolver_state[player->index()] = "REVERSEFS";
+			record->m_eye_angles.y = data->m_best_angle;
+		}
+		else if (data->m_lastmove_idx >= 1 || data->m_reverse_fs < 1 && IsYawSideways(player, move->m_body))
+		{
+			//set resolve mode
+			record->m_mode = Modes::RESOLVE_STAND2;
+			switch (data->m_stand_index % 3) {
+			case 0:
+				record->m_eye_angles.y = data->m_best_angle;
+				resolver_state[player->index()] = "AFS[0]";
+				break;
+			case 1:
+				record->m_eye_angles.y = away + 180.f;//yet
+				resolver_state[player->index()] = "AFS[1]";
+				break;
+			case 2:
+				record->m_eye_angles.y = away;//yet
+				resolver_state[player->index()] = "AFS[2]";
+				break;
+			}
+
+		}
 		else {
 			if (!data->m_has_freestand) {
-				record->m_eye_angles.y = away + 180.f;
+				record->m_eye_angles.y = away + 180.f; // backward
 				resolver_state[player->index()] = "BACKWARD";
 			}
-			else if (data->m_has_freestand) {
-				record->m_eye_angles.y = data->m_best_angle;
-				resolver_state[player->index()] = "AFS";
-			}
-
 		}
 
-		if (!record->m_fake_walk && data->m_body_index <= 2) {
-			record->m_mode = Modes::RESOLVE_BODY;
-
-			// body updated.
-			if ((math::AngleDiff(previous_record->m_body, record->m_body) > 30.f)) {
-
-				// set the resolve mode.
-				resolver_state[player->index()] = "LBYUPD";
-
-				// update their old body.
-				data->m_old_body = record->m_body;
-
-				// set angles to current LBY.
-				record->m_eye_angles.y = record->m_body;
-				iPlayers[player->index()] = false;
-
-				// delay body update.
-				data->m_body_update = record->m_anim_time + 1.1f;
-				data->m_has_body_updated = true;
-
-				// we've seen them update.
-				// exit out of the resolver, thats it.
-				return;
-			}
-
-			// lby should have updated here.
-			if (data->m_has_body_updated && (record->m_anim_time >= data->m_body_update)) {
-				resolver_state[player->index()] = "LBYPRED";
-
-				// set angles to current LBY.
-				record->m_eye_angles.y = record->m_body;
-
-				// predict next body update.
-				data->m_body_update = record->m_anim_time + 1.1f;
-
-				iPlayers[player->index()] = false;
-
-				// exit out of the resolver, thats it.
-				return;
-			}
-		}
+		
 	}
 
+	if (!record->m_fake_walk && data->m_body_index <= 2) {
+		record->m_mode = Modes::RESOLVE_BODY;
+
+		// body updated.
+		if ((math::AngleDiff(previous_record->m_body, record->m_body) > 30.f)) {
+
+			// set the resolve mode.
+			resolver_state[player->index()] = "LBYUPD";
+
+			// update their old body.
+			data->m_old_body = record->m_body;
+
+			// set angles to current LBY.
+			record->m_eye_angles.y = record->m_body;
+			iPlayers[player->index()] = false;
+
+			// delay body update.
+			data->m_body_update = record->m_anim_time + 1.1f;
+			data->m_has_body_updated = true;
+
+			// we've seen them update.
+			// exit out of the resolver, thats it.
+			return;
+		}
+
+		// lby should have updated here.
+		if (data->m_has_body_updated && (record->m_anim_time >= data->m_body_update)) {
+			resolver_state[player->index()] = "LBYPRED";
+
+			// set angles to current LBY.
+			record->m_eye_angles.y = record->m_body;
+
+			// predict next body update.
+			data->m_body_update = record->m_anim_time + 1.1f;
+
+			iPlayers[player->index()] = false;
+
+			// exit out of the resolver, thats it.
+			return;
+		}
+	}
 
 	/*switch (data->m_missed_shots % 4)
 	{

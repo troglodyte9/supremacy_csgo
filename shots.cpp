@@ -431,6 +431,11 @@ void Shots::OnShotMiss(ShotRecord& shot) {
 			++data->m_backwards_idx;
 		}
 
+		else if (mode == Resolver::Modes::RESOLVE_STAND3)
+		{
+			++data->m_stand_index3;
+		}
+
 		else if (mode == Resolver::Modes::RESOLVE_LBY)
 		{
 			++data->m_lby_idx;
@@ -441,6 +446,9 @@ void Shots::OnShotMiss(ShotRecord& shot) {
 			++data->m_freestand_idx;
 		}
 
+		else if (mode == Resolver::Modes::RESOLVE_REVERSEFS){
+			++data->m_reverse_fs;
+		}
 		else if (mode == Resolver::Modes::RESOLVE_LASTMOVE)
 		{
 			++data->m_lastmove_idx;

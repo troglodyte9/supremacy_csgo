@@ -82,10 +82,12 @@ public:
 	float     m_best_distance;
 	float     m_best_yaw;
 	bool    m_has_freestand;
+	int       m_reverse_fs;
 	int m_last_move;
 	bool m_correct_move;
 	
 	int m_backwards_idx;
+	int m_stand_index3;
 	int m_freestand_idx;
 	int m_lby_idx;
 	int m_lastmove_idx;

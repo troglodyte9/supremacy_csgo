@@ -409,9 +409,11 @@ void AimPlayer::OnNetUpdate(Player* player) {
 		m_unknown_move = 0;
 		m_moving_index = 0;
 		m_freestanding_index = 0;
+		m_reverse_fs = 0;
 
 		m_backwards_idx = 0;
 		m_freestand_idx = 0;
+		m_stand_index3 = 0;
 		m_lby_idx = 0;
 		m_lastmove_idx = 0;
 		m_has_body_updated = false;
@@ -426,12 +428,14 @@ void AimPlayer::OnNetUpdate(Player* player) {
 		m_records.clear();
 		m_stand_index = 0;
 		m_stand_index2 = 0;
+		m_stand_index3 = 0;
 		m_body_index = 0;
 		m_last_move = 0;
 		m_lby_delta_index = 0;
 		m_unknown_move = 0;
 		m_moving_index = 0;
 		m_freestanding_index = 0;
+		m_reverse_fs = 0;
 
 		m_backwards_idx = 0;
 		m_freestand_idx = 0;
@@ -455,7 +459,9 @@ void AimPlayer::OnNetUpdate(Player* player) {
 		m_body_index = 0;
 		m_last_move = 0;
 		m_lby_delta_index = 0;
+		m_stand_index3 = 0;
 		m_unknown_move = 0;
+		m_reverse_fs = 0;
 		m_moving_index = 0;
 		m_freestanding_index = 0;
 
@@ -550,6 +556,8 @@ void AimPlayer::OnRoundStart(Player* player) {
 	m_bruteforce_idx = 0;
 
 	m_backwards_idx = 0;
+	m_stand_index3 = 0;
+	m_reverse_fs = 0;
 	m_freestand_idx = 0;
 	m_lby_idx = 0;
 	m_lastmove_idx = 0;
@@ -1486,7 +1494,7 @@ bool AimPlayer::GetBestAimPosition(vec3_t& aim, int& hitbox_id, float& damage, L
 
 			pendmg = dmg;
 			if (g_menu.main.aimbot.minimal_damage_hp.get())
-				pendmg = std::ceil((pendmg / 100.f) * hp);
+				pendmg = std::ceil((dmg / 100.f) * hp);
 
 			pen = g_menu.main.aimbot.penetrate.get();
 	}
