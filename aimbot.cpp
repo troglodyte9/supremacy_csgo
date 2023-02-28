@@ -409,11 +409,11 @@ void AimPlayer::OnNetUpdate(Player* player) {
 		m_unknown_move = 0;
 		m_moving_index = 0;
 		m_freestanding_index = 0;
+		m_stand_index3 = 0;
 		m_reverse_fs = 0;
 
 		m_backwards_idx = 0;
 		m_freestand_idx = 0;
-		m_stand_index3 = 0;
 		m_lby_idx = 0;
 		m_lastmove_idx = 0;
 		m_has_body_updated = false;
@@ -427,7 +427,6 @@ void AimPlayer::OnNetUpdate(Player* player) {
 	if (m_player != player) {
 		m_records.clear();
 		m_stand_index2 = 0;
-		m_stand_index3 = 0;
 		m_body_index = 0;
 		m_last_move = 0;
 		m_lby_delta_index = 0;
@@ -439,6 +438,7 @@ void AimPlayer::OnNetUpdate(Player* player) {
 
 		m_backwards_idx = 0;
 		m_freestand_idx = 0;
+		m_stand_index3 = 0;
 		m_lby_idx = 0;
 		m_lastmove_idx = 0;
 		m_bruteforce_idx = 0;
