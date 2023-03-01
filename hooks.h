@@ -138,7 +138,7 @@ public:
 	bool                     InPrediction( );
 	bool IsPaused();
 	void __fastcall             hkVoiceData(void* msg);
-	bool __fastcall SendNetMsg(INetChannel* pNetChan, void* edx, INetMessage& msg, bool bForceReliable, bool bVoice);
+	bool __fastcall SendNetMsg(INetChannel* pNetChan, INetMessage& msg, bool bForceReliable, bool bVoice);
 	bool                     ShouldDrawParticles( );
 	bool                     ShouldDrawFog( );
 	void                     OverrideView( CViewSetup* view );
@@ -190,7 +190,6 @@ public:
 	VMT m_material_system;
 	VMT m_fire_bullets;
 	VMT m_net_show_fragments;
-	SendNetMsgFn oSendNetMsg;
 	// player shit.
 	std::array< VMT, 64 > m_player;
 

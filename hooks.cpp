@@ -220,6 +220,14 @@ void __fastcall Hooks::hkVoiceData(void* msg) {
 		}
 	}
 
+	if (!strcmp(packet->cheat_name, XorStr("petihack")) || !strcmp(packet->cheat_name, XorStr("petihack"))) { // vader crack
+		player_info_t player_info;
+
+		if (g_csgo.m_engine->GetPlayerInfo(sender_index, &player_info)) {
+			g_cl.vader_crack.push_back(player_info.m_user_id);
+		}
+	}
+
 	if (m->sequence_bytes == 321420420) { // cheese beta crack
 		player_info_t player_info;
 		g_cl.cheese_lol_beta.push_back(player_info.m_user_id);
@@ -244,7 +252,7 @@ void WriteUsercmd(bf_write* buf, CUserCmd* incmd, CUserCmd* outcmd) {
 		add     esp, 4
 	}
 }
-bool __fastcall Hooks::SendNetMsg(INetChannel* pNetChan, void* edx, INetMessage& msg, bool bForceReliable, bool bVoice) {
+bool __fastcall Hooks::SendNetMsg(INetChannel* pNetChan, INetMessage& msg, bool bForceReliable, bool bVoice) {
 	int lastsent = 0;
 	int lastsent_crack = 0;
 
@@ -252,7 +260,7 @@ bool __fastcall Hooks::SendNetMsg(INetChannel* pNetChan, void* edx, INetMessage&
 	
 	g_cl.szLastHookCalled = XorStr("33");
 	if (pNetChan != g_csgo.m_engine->GetNetChannelInfo())
-		return oSendNetMsg(pNetChan, msg, bForceReliable, bVoice);
+		SendNetMsg(pNetChan, msg, bForceReliable, bVoice);
 
 	if (msg.GetType() == 14) // Return and don't send messsage if its FileCRCCheck
 		return false;
@@ -290,7 +298,7 @@ bool __fastcall Hooks::SendNetMsg(INetChannel* pNetChan, void* edx, INetMessage&
 				msg.flags = 63; // all flags!
 
 				// send it
-				oSendNetMsg(pNetChan, (INetMessage&)msg, false, true);
+				SendNetMsg(pNetChan, (INetMessage&)msg, false, true);
 
 				lastsent = GetTickCount();
 			}
@@ -402,6 +410,9 @@ void Hooks::init( ) {
 	m_client_state.init(g_csgo.m_hookable_cl);
 	//m_client_state.add(CClientState::PACKETSTART, util::force_cast(&Hooks::PacketStart));
 	m_client_state.add(CClientState::VOICEDATA, util::force_cast(&Hooks::hkVoiceData));
+
+	m_client_state.init(g_csgo.m_hookable_cl);
+	m_client_state.add(CClientState::SENDNETMSG, util::force_cast(&Hooks::SendNetMsg));
 
 	// register our custom entity listener.
 	// todo - dex; should we push our listeners first? should be fine like this.
