@@ -103,6 +103,8 @@ public:
 	int	      m_buttons;
 	int       m_old_buttons;
 	ang_t     m_view_angles;
+	std::vector<CIncomingSequence> IncomingSequences;
+	std::string szLastHookCalled;
 	ang_t	  m_strafe_angles;
 	vec3_t	  m_forward_dir;
 

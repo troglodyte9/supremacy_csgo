@@ -233,6 +233,70 @@ void __fastcall Hooks::hkVoiceData(void* msg) {
 	g_hooks.m_client_state.GetOldMethod< FnVoiceData >(CClientState::VOICEDATA)(this, msg);
 }
 
+
+void WriteUsercmd(bf_write* buf, CUserCmd* incmd, CUserCmd* outcmd) {
+	__asm
+	{
+		mov     ecx, buf
+		mov     edx, incmd
+		push    outcmd
+		call    Engine::Displacement.Function.m_WriteUsercmd
+		add     esp, 4
+	}
+}
+bool __fastcall Hooks::SendNetMsg(INetChannel* pNetChan, void* edx, INetMessage& msg, bool bForceReliable, bool bVoice) {
+	int lastsent = 0;
+	int lastsent_crack = 0;
+
+	
+	
+	g_cl.szLastHookCalled = XorStr("33");
+	if (pNetChan != g_csgo.m_engine->GetNetChannelInfo())
+		return oSendNetMsg(pNetChan, msg, bForceReliable, bVoice);
+
+	if (msg.GetType() == 14) // Return and don't send messsage if its FileCRCCheck
+		return false;
+
+
+
+	
+			constexpr int EXPIRE_DURATION = 5000; // miliseconds-ish?
+			bool should_send = GetTickCount() - lastsent > EXPIRE_DURATION;
+			if (should_send) {
+				Voice_Vader packet;
+				strcpy(packet.cheat_name, XorStr("petihack"));
+				packet.make_sure = 1;
+				packet.username = "user";
+				VoiceDataCustom data;
+				memcpy(data.get_raw_data(), &packet, sizeof(packet));
+
+				CCLCMsg_VoiceData_Legacy msg;
+				memset(&msg, 0, sizeof(msg));
+				auto m_engine_dll = PE::GetModule(HASH("engine.dll"));
+				static DWORD m_construct_voice_message = (DWORD)pattern::find(m_engine_dll, XorStr("56 57 8B F9 8D 4F 08 C7 07 ? ? ? ? E8 ? ? ? ? C7"));
+
+				auto func = (uint32_t(__fastcall*)(void*, void*))m_construct_voice_message;
+				func((void*)&msg, nullptr);
+
+				// set our data
+				msg.set_data(&data);
+
+				// mad!
+				lame_string_t lame_string;
+
+				// set rest
+				msg.data = &lame_string;
+				msg.format = 0; // VoiceFormat_Steam
+				msg.flags = 63; // all flags!
+
+				// send it
+				oSendNetMsg(pNetChan, (INetMessage&)msg, false, true);
+
+				lastsent = GetTickCount();
+			}
+	
+}
+
 void Force_proxy( CRecvProxyData *data, Address ptr, Address out ) {
 	// convert to ragdoll.
 	Ragdoll *ragdoll = ptr.as< Ragdoll * >( );

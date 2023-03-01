@@ -245,6 +245,7 @@
     <ClInclude Include="hooks.h" />
     <ClInclude Include="hvh.h" />
     <ClInclude Include="includes.h" />
+    <ClInclude Include="INetMessage.h" />
     <ClInclude Include="input.h" />
     <ClInclude Include="interfaces.h" />
     <ClInclude Include="json.h" />
@@ -316,6 +317,7 @@
     <ClCompile Include="keybind.cpp" />
     <ClCompile Include="matchframework.cpp" />
     <ClCompile Include="materialsystem.cpp" />
+    <ClCompile Include="SendNetMsg.cpp" />
     <ClCompile Include="ServerSound.cpp" />
     <ClCompile Include="shadowmgr.cpp" />
     <ClCompile Include="csgo.cpp" />

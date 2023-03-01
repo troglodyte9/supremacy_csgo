@@ -14,6 +14,8 @@
 #define NOMINMAX
 
 using ulong_t = unsigned long;
+class bf_read;
+class bf_write;
 
 // windows / stl includes.
 #include <Windows.h>
@@ -65,6 +67,7 @@ using ulong_t = unsigned long;
 #include "csgo.h"
 #include "penetration.h"
 #include "netvars.h"
+#include "INetMessage.h"
 #include "entoffsets.h"
 #include "entity.h"
 #include "client.h"

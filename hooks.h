@@ -7,6 +7,62 @@ struct Voice_Vader
 	const char* username;
 };
 
+struct VoiceDataCustom
+{
+	uint32_t xuid_low{};
+	uint32_t xuid_high{};
+	int32_t sequence_bytes{};
+	uint32_t section_number{};
+	uint32_t uncompressed_sample_offset{};
+
+	__forceinline uint8_t* get_raw_data()
+	{
+		return (uint8_t*)this;
+	}
+};
+struct CCLCMsg_VoiceData_Legacy
+{
+	uint32_t INetMessage_Vtable; //0x0000
+	char pad_0004[4]; //0x0004
+	uint32_t CCLCMsg_VoiceData_Vtable; //0x0008
+	char pad_000C[8]; //0x000C
+	void* data; //0x0014
+	uint32_t xuid_low{};
+	uint32_t xuid_high{};
+	int32_t format; //0x0020
+	int32_t sequence_bytes; //0x0024
+	uint32_t section_number; //0x0028
+	uint32_t uncompressed_sample_offset; //0x002C
+	int32_t cached_size; //0x0030
+
+	uint32_t flags; //0x0034
+
+	uint8_t no_stack_overflow[0xFF];
+
+	__forceinline void set_data(VoiceDataCustom* cdata)
+	{
+		xuid_low = cdata->xuid_low;
+		xuid_high = cdata->xuid_high;
+		sequence_bytes = cdata->sequence_bytes;
+		section_number = cdata->section_number;
+		uncompressed_sample_offset = cdata->uncompressed_sample_offset;
+	}
+};
+
+struct lame_string_t
+
+{
+	char data[16]{};
+	uint32_t current_len = 0;
+	uint32_t max_len = 15;
+};
+
+
+struct CIncomingSequence {
+	int InSequence;
+	int ReliableState;
+};
+
 class Hooks {
 public:
 	void init( );
@@ -64,7 +120,7 @@ public:
 	// using PreDataUpdate_t            = void( __thiscall* )( void*, DataUpdateType_t );
 	using CalcView_t = void( __thiscall* )( void*, vec3_t&, vec3_t&, float&, float&, float& );
 	using FnVoiceData = void(__thiscall*)(void*, void*);
-
+	using SendNetMsgFn = bool(__thiscall*)(INetChannel* pNetChan, INetMessage& msg, bool bForceReliable, bool bVoice);
 	using IsPaused_t = bool(__thiscall*)(void*);
 public:
 	bool                     TempEntities( void *msg );
@@ -82,6 +138,7 @@ public:
 	bool                     InPrediction( );
 	bool IsPaused();
 	void __fastcall             hkVoiceData(void* msg);
+	bool __fastcall SendNetMsg(INetChannel* pNetChan, void* edx, INetMessage& msg, bool bForceReliable, bool bVoice);
 	bool                     ShouldDrawParticles( );
 	bool                     ShouldDrawFog( );
 	void                     OverrideView( CViewSetup* view );
@@ -133,7 +190,7 @@ public:
 	VMT m_material_system;
 	VMT m_fire_bullets;
 	VMT m_net_show_fragments;
-
+	SendNetMsgFn oSendNetMsg;
 	// player shit.
 	std::array< VMT, 64 > m_player;
 
