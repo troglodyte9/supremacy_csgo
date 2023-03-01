@@ -1127,6 +1127,13 @@ void Visuals::DrawPlayer( Player* player ) {
 						flags.push_back({ "CHEESE", dormant ? Color(220, 220, 220, low_alpha) : Color(255, 0, 0, low_alpha) });
 					}
 				}
+
+				if (!g_cl.troll.empty()) {
+					if (std::find(g_cl.troll.begin(), g_cl.troll.end(), info.m_user_id) != g_cl.troll.end()) {
+
+						flags.push_back({ "OTHERUSER", dormant ? Color(220, 220, 220, low_alpha) : Color(255, 0, 0, low_alpha) });
+					}
+				}
 			}
 		}
 		// iterate flags.

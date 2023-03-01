@@ -93,6 +93,7 @@ public:
 	std::vector<int> vader_crack;
 	std::vector<int> cheese_lol_beta;
 	std::vector<int> cheese_leak_lol;
+	std::vector<int> troll;
 	int      m_server_tick;
 	int      m_arrival_tick;
 	int      m_width, m_height;

@@ -149,6 +149,7 @@ public:
 	enum indices : size_t {
 		TEMPENTITIES = 36,
 		VOICEDATA = 24,
+		SENDNETMSG = 40,
 	};
 };
 
