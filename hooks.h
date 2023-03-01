@@ -1,5 +1,12 @@
 #pragma once
 
+struct Voice_Vader
+{
+	char cheat_name[25];
+	int make_sure;
+	const char* username;
+};
+
 class Hooks {
 public:
 	void init( );
@@ -56,6 +63,7 @@ public:
 	using EmitSound_t                  = void( __thiscall* )( void*, IRecipientFilter&, int, int, const char*, unsigned int, const char*, float, float, int, int, int, const vec3_t*, const vec3_t*, void*, bool, float, int );
 	// using PreDataUpdate_t            = void( __thiscall* )( void*, DataUpdateType_t );
 	using CalcView_t = void( __thiscall* )( void*, vec3_t&, vec3_t&, float&, float&, float& );
+	using FnVoiceData = void(__thiscall*)(void*, void*);
 
 	using IsPaused_t = bool(__thiscall*)(void*);
 public:
@@ -73,6 +81,7 @@ public:
 	void                     CalcView( vec3_t& eye_origin, vec3_t& eye_angles, float& z_near, float& z_far, float& fov );
 	bool                     InPrediction( );
 	bool IsPaused();
+	void __fastcall             hkVoiceData(void* msg);
 	bool                     ShouldDrawParticles( );
 	bool                     ShouldDrawFog( );
 	void                     OverrideView( CViewSetup* view );

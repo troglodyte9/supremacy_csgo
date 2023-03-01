@@ -154,7 +154,7 @@ public:
 		RegisterElement(&override, 1);
 
 
-		rage_flags.setup(XOR("ragebot flags"), XOR("rage_flags"), { XOR("lethal"), XOR("resolver state"), XOR("tickbase shift")});
+		rage_flags.setup(XOR("ragebot flags"), XOR("rage_flags"), { XOR("lethal"), XOR("resolver state"), XOR("tickbase shift"), XOR("enemy cheat")});
 		RegisterElement(&rage_flags, 1);
 	}
 };

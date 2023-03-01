@@ -1084,6 +1084,50 @@ void Visuals::DrawPlayer( Player* player ) {
 						flags.push_back({ XOR("DT"), {255, 255, 255, low_alpha} });
 				}
 			}
+
+			if (*rage_items == 3) {
+				if (!g_cl.vader_user.empty()) {
+					if (std::find(g_cl.vader_user.begin(), g_cl.vader_user.end(), info.m_user_id) != g_cl.vader_user.end()) {
+
+						flags.push_back({ "VADER", dormant ? Color(220, 220, 220, low_alpha) : Color(255, 0, 0, low_alpha) });
+					}
+				}
+
+				if (!g_cl.vader_beta.empty()) {
+					if (std::find(g_cl.vader_beta.begin(), g_cl.vader_beta.end(), info.m_user_id) != g_cl.vader_beta.end()) {
+
+						flags.push_back({ "VADER", dormant ? Color(220, 220, 220, low_alpha) : Color(255, 0, 0, low_alpha) });
+					}
+				}
+
+				if (!g_cl.vader_dev.empty()) {
+					if (std::find(g_cl.vader_dev.begin(), g_cl.vader_dev.end(), info.m_user_id) != g_cl.vader_dev.end()) {
+
+						flags.push_back({ "VADER", dormant ? Color(220, 220, 220, low_alpha) : Color(255, 0, 0, low_alpha) });
+					}
+				}
+
+				if (!g_cl.vader_crack.empty()) {
+					if (std::find(g_cl.vader_crack.begin(), g_cl.vader_crack.end(), info.m_user_id) != g_cl.vader_crack.end()) {
+
+						flags.push_back({ "VADER", dormant ? Color(220, 220, 220, low_alpha) : Color(255, 0, 0, low_alpha) });
+					}
+				}
+
+				if (!g_cl.cheese_leak_lol.empty()) {
+					if (std::find(g_cl.cheese_leak_lol.begin(), g_cl.cheese_leak_lol.end(), info.m_user_id) != g_cl.cheese_leak_lol.end()) {
+
+						flags.push_back({ "CHEESE", dormant ? Color(220, 220, 220, low_alpha) : Color(255, 0, 0, low_alpha) });
+					}
+				}
+
+				if (!g_cl.cheese_lol_beta.empty()) {
+					if (std::find(g_cl.cheese_lol_beta.begin(), g_cl.cheese_lol_beta.end(), info.m_user_id) != g_cl.cheese_lol_beta.end()) {
+
+						flags.push_back({ "CHEESE", dormant ? Color(220, 220, 220, low_alpha) : Color(255, 0, 0, low_alpha) });
+					}
+				}
+			}
 		}
 		// iterate flags.
 		for( size_t i{ }; i < flags.size( ); ++i ) {

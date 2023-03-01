@@ -87,6 +87,12 @@ public:
 	float	 m_lerp;
 	float    m_latency;
 	int      m_latency_ticks;
+	std::vector<int> vader_user;
+	std::vector<int> vader_beta;
+	std::vector<int> vader_dev;
+	std::vector<int> vader_crack;
+	std::vector<int> cheese_lol_beta;
+	std::vector<int> cheese_leak_lol;
 	int      m_server_tick;
 	int      m_arrival_tick;
 	int      m_width, m_height;

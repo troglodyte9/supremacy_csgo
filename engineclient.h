@@ -148,6 +148,7 @@ public:
 
 	enum indices : size_t {
 		TEMPENTITIES = 36,
+		VOICEDATA = 24,
 	};
 };
 
