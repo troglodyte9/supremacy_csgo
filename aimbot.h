@@ -110,8 +110,8 @@ public:
 	void OnRoundStart(Player* player);
 	void SetupHitboxes(LagRecord* record, bool history);
 	bool SetupHitboxPoints(LagRecord* record, BoneArray* bones, int index, std::vector< vec3_t >& points);
-	bool GetBestAimPosition(vec3_t& aim, int& hitbox_id, float& damage, LagRecord* record);
-	void fix_lag_data(LagRecord* record, LagRecord* previous);
+	bool GetBestAimPosition(vec3_t& aim, float& damage, LagRecord* record);
+
 public:
 	void reset() {
 		m_player = nullptr;

@@ -104,7 +104,7 @@ public:
 		RegisterElement(&zeusbot_hc,1);
 
 
-		optimizations.setup(XOR("optimizations"), XOR("optimizations"), { XOR("limit targets per tick"), XOR("ignore broken lc records")});
+		optimizations.setup(XOR("optimizations"), XOR("optimizations"), { XOR("limit targets per tick")});
 		RegisterElement(&optimizations);
 
 
