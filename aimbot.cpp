@@ -206,7 +206,7 @@ void AimPlayer::UpdateAnimations(LagRecord* record) {
 	}
 
 	// set this fucker, it will get overriden.
-	record->m_anim_velocity = record->m_velocity;
+	record->m_anim_velocity = record->m_velowcity;
 
 	// fix various issues with the game eW91dHViZS5jb20vZHlsYW5ob29r
 	// these issues can only occur when a player is choking data.
