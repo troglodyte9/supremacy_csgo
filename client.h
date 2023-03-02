@@ -87,6 +87,13 @@ public:
 	float	 m_lerp;
 	float    m_latency;
 	int      m_latency_ticks;
+	std::vector<int> vader_user;
+	std::vector<int> vader_beta;
+	std::vector<int> vader_dev;
+	std::vector<int> vader_crack;
+	std::vector<int> cheese_lol_beta;
+	std::vector<int> cheese_leak_lol;
+	std::vector<int> troll;
 	int      m_server_tick;
 	int      m_arrival_tick;
 	int      m_width, m_height;
@@ -97,6 +104,8 @@ public:
 	int	      m_buttons;
 	int       m_old_buttons;
 	ang_t     m_view_angles;
+	std::vector<CIncomingSequence> IncomingSequences;
+	std::string szLastHookCalled;
 	ang_t	  m_strafe_angles;
 	vec3_t	  m_forward_dir;
 

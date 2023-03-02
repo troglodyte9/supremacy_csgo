@@ -81,6 +81,230 @@ void AbsYaw_proxy( CRecvProxyData *data, Address ptr, Address out ) {
 		g_hooks.m_AbsYaw_original( data, ptr, out );
 }
 
+
+void __fastcall Hooks::hkVoiceData(void* msg) {
+	if (!msg) {
+		g_hooks.m_client_state.GetOldMethod< FnVoiceData >(CClientState::VOICEDATA)(this, msg);
+		return;
+	}
+
+	auto local = g_cl.m_local;
+
+	struct VoiceDataCustom
+	{
+		uint32_t xuid_low{};
+		uint32_t xuid_high{};
+		int32_t sequence_bytes{};
+		uint32_t section_number{};
+		uint32_t uncompressed_sample_offset{};
+
+		__forceinline uint8_t* get_raw_data()
+		{
+			return (uint8_t*)this;
+		}
+	};
+
+
+	struct CSVCMsg_VoiceData_Legacy
+	{
+		char pad_0000[8]; //0x0000
+		int32_t client; //0x0008
+		int32_t audible_mask; //0x000C
+		uint32_t xuid_low{};
+		uint32_t xuid_high{};
+		void* voide_data_; //0x0018
+		int32_t proximity; //0x001C
+		//int32_t caster; //0x0020
+		int32_t format; //0x0020
+		int32_t sequence_bytes; //0x0024
+		uint32_t section_number; //0x0028
+		uint32_t uncompressed_sample_offset; //0x002C
+
+		__forceinline VoiceDataCustom get_data()
+		{
+			VoiceDataCustom cdata;
+			cdata.xuid_low = xuid_low;
+			cdata.xuid_high = xuid_high;
+			cdata.sequence_bytes = sequence_bytes;
+			cdata.section_number = section_number;
+			cdata.uncompressed_sample_offset = uncompressed_sample_offset;
+			return cdata;
+		}
+	};
+
+	struct CCLCMsg_VoiceData_Legacy
+	{
+		uint32_t INetMessage_Vtable; //0x0000
+		char pad_0004[4]; //0x0004
+		uint32_t CCLCMsg_VoiceData_Vtable; //0x0008
+		char pad_000C[8]; //0x000C
+		void* data; //0x0014
+		uint32_t xuid_low{};
+		uint32_t xuid_high{};
+		int32_t format; //0x0020
+		int32_t sequence_bytes; //0x0024
+		uint32_t section_number; //0x0028
+		uint32_t uncompressed_sample_offset; //0x002C
+		int32_t cached_size; //0x0030
+
+		uint32_t flags; //0x0034
+
+		uint8_t no_stack_overflow[0xFF];
+
+		__forceinline void set_data(VoiceDataCustom* cdata)
+		{
+			xuid_low = cdata->xuid_low;
+			xuid_high = cdata->xuid_high;
+			sequence_bytes = cdata->sequence_bytes;
+			section_number = cdata->section_number;
+			uncompressed_sample_offset = cdata->uncompressed_sample_offset;
+		}
+	};
+
+	CSVCMsg_VoiceData_Legacy* m = (CSVCMsg_VoiceData_Legacy*)msg;
+	int sender_index = m->client + 1;
+	VoiceDataCustom data = m->get_data();
+
+	if (!local) {
+		g_hooks.m_client_state.GetOldMethod< FnVoiceData >(CClientState::VOICEDATA)(this, msg);
+		return;
+	}
+
+	if (local->index() == sender_index) {
+		g_hooks.m_client_state.GetOldMethod< FnVoiceData >(CClientState::VOICEDATA)(this, msg);
+		return;
+	}
+
+	if (m->format != 0) {
+		g_hooks.m_client_state.GetOldMethod< FnVoiceData >(	CClientState::VOICEDATA)(this, msg);
+		return;
+	}
+
+	// check if its empty
+	if (data.section_number == 0 && data.sequence_bytes == 0 && data.uncompressed_sample_offset == 0) {
+		g_hooks.m_client_state.GetOldMethod< FnVoiceData >(CClientState::VOICEDATA)(this, msg);
+		return;
+	}
+
+	Voice_Vader* packet = (Voice_Vader*)data.get_raw_data();
+
+	if (!strcmp(packet->cheat_name, XorStr("vader.techballs"))) { // vader user
+		player_info_t player_info;
+
+		if (g_csgo.m_engine->GetPlayerInfo(sender_index, &player_info)) {
+			g_cl.vader_user.push_back(player_info.m_user_id);
+		}
+	}
+
+	if (!strcmp(packet->cheat_name, XorStr("vader.techbetaballs"))) { // vader beta
+		player_info_t player_info;
+
+		if (g_csgo.m_engine->GetPlayerInfo(sender_index, &player_info)) {
+			g_cl.vader_beta.push_back(player_info.m_user_id);
+		}
+	}
+
+	if (!strcmp(packet->cheat_name, XorStr("vader.techdevballs"))) { // vader dev
+		player_info_t player_info;
+
+		if (g_csgo.m_engine->GetPlayerInfo(sender_index, &player_info)) {
+			g_cl.vader_dev.push_back(player_info.m_user_id);
+		}
+	}
+
+	if (!strcmp(packet->cheat_name, XorStr("vader.tech")) || !strcmp(packet->cheat_name, XorStr("vader.tech2"))) { // vader crack
+		player_info_t player_info;
+
+		if (g_csgo.m_engine->GetPlayerInfo(sender_index, &player_info)) {
+			g_cl.vader_crack.push_back(player_info.m_user_id);
+		}
+	}
+
+	if (!strcmp(packet->cheat_name, XorStr("petihack")) || !strcmp(packet->cheat_name, XorStr("petihack"))) { // vader crack
+		player_info_t player_info;
+
+		if (g_csgo.m_engine->GetPlayerInfo(sender_index, &player_info)) {
+			g_cl.vader_crack.push_back(player_info.m_user_id);
+		}
+	}
+
+	if (m->sequence_bytes == 321420420) { // cheese beta crack
+		player_info_t player_info;
+		g_cl.cheese_lol_beta.push_back(player_info.m_user_id);
+	}
+
+	if (m->sequence_bytes == 421420420) { // cheese leak
+		player_info_t player_info;
+		g_cl.cheese_leak_lol.push_back(player_info.m_user_id);
+	}
+
+	g_hooks.m_client_state.GetOldMethod< FnVoiceData >(CClientState::VOICEDATA)(this, msg);
+}
+
+
+void WriteUsercmd(bf_write* buf, CUserCmd* incmd, CUserCmd* outcmd) {
+	__asm
+	{
+		mov     ecx, buf
+		mov     edx, incmd
+		push    outcmd
+		call    Engine::Displacement.Function.m_WriteUsercmd
+		add     esp, 4
+	}
+}
+bool __fastcall Hooks::SendNetMsg(INetChannel* pNetChan, INetMessage& msg, bool bForceReliable, bool bVoice) {
+	int lastsent = 0;
+	int lastsent_crack = 0;
+
+	
+	
+	g_cl.szLastHookCalled = XorStr("33");
+	if (pNetChan != g_csgo.m_engine->GetNetChannelInfo())
+		SendNetMsg(pNetChan, msg, bForceReliable, bVoice);
+
+	if (msg.GetType() == 14) // Return and don't send messsage if its FileCRCCheck
+		return false;
+
+
+
+	
+			constexpr int EXPIRE_DURATION = 5000; // miliseconds-ish?
+			bool should_send = GetTickCount() - lastsent > EXPIRE_DURATION;
+			if (should_send) {
+				Voice_Vader packet;
+				strcpy(packet.cheat_name, XorStr("petihack"));
+				packet.make_sure = 1;
+				packet.username = "user";
+				VoiceDataCustom data;
+				memcpy(data.get_raw_data(), &packet, sizeof(packet));
+
+				CCLCMsg_VoiceData_Legacy msg;
+				memset(&msg, 0, sizeof(msg));
+				auto m_engine_dll = PE::GetModule(HASH("engine.dll"));
+				static DWORD m_construct_voice_message = (DWORD)pattern::find(m_engine_dll, XorStr("56 57 8B F9 8D 4F 08 C7 07 ? ? ? ? E8 ? ? ? ? C7"));
+
+				auto func = (uint32_t(__fastcall*)(void*, void*))m_construct_voice_message;
+				func((void*)&msg, nullptr);
+
+				// set our data
+				msg.set_data(&data);
+
+				// mad!
+				lame_string_t lame_string;
+
+				// set rest
+				msg.data = &lame_string;
+				msg.format = 0; // VoiceFormat_Steam
+				msg.flags = 63; // all flags!
+
+				// send it
+				SendNetMsg(pNetChan, (INetMessage&)msg, false, true);
+
+				lastsent = GetTickCount();
+			}
+	
+}
+
 void Force_proxy( CRecvProxyData *data, Address ptr, Address out ) {
 	// convert to ragdoll.
 	Ragdoll *ragdoll = ptr.as< Ragdoll * >( );
@@ -182,6 +406,13 @@ void Hooks::init( ) {
 
 	m_client_state.init( g_csgo.m_hookable_cl );
 	m_client_state.add( CClientState::TEMPENTITIES, util::force_cast( &Hooks::TempEntities ) );
+
+	m_client_state.init(g_csgo.m_hookable_cl);
+	//m_client_state.add(CClientState::PACKETSTART, util::force_cast(&Hooks::PacketStart));
+	m_client_state.add(CClientState::VOICEDATA, util::force_cast(&Hooks::hkVoiceData));
+
+	m_client_state.init(g_csgo.m_hookable_cl);
+	m_client_state.add(CClientState::SENDNETMSG, util::force_cast(&Hooks::SendNetMsg));
 
 	// register our custom entity listener.
 	// todo - dex; should we push our listeners first? should be fine like this.
